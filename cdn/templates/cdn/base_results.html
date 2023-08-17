@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="{% static 'cdn/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'cdn/cdn.css' %}" rel="stylesheet">
+    <script src="{% static 'cdn/jquery-3.6.3.min.js' %}"></script>
+    <link rel="icon" href="{% static 'cdn/img/favicon.png' %}" type="image/png">    
+    <meta name="description" content="{% block description_contetnt %}Результат ввода данных{% endblock %}">
+    <title>{% block title %}Результат ввода данных{% endblock %}</title>
+</head>
+<body class="bg-light">
+    <div class="container py-5 text-center"><div class="w-75">
+        <h1>{% block h1 %}Результат ввода данных{% endblock %}</h1>
+        {% block subheader %}{% endblock %}
+        {% block content %}{% endblock %}    
+        <div class="text-start pt-5"><a href = "{% block back_url %}/{% endblock %}" class="btn btn-info text-white">Назад</a></div>
+    </div></div>
+</body>
+</html>

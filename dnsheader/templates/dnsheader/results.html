@@ -1,0 +1,80 @@
+{% extends "cdn/base_results.html" %}
+{% block description_contetnt %}Сведения о DNS домена и HTTP заголовках{% endblock %}
+{% block title %}DNS домена и HTTP заголовки{% endblock %}
+{% block h1 %}Сведения о DNS домена и HTTP заголовках{% endblock %}
+{% block subheader %}
+    <h2>{{domain}}</h2>
+{% endblock %}
+{% block content %}
+<h5 class="m-5">DNS</h5>
+<div class="row">
+    {% for r_domain in result_domain%}
+    <div class="col">
+        {% if r_domain.query %}
+            <p class="text-start m-0"><strong>Domain: </strong>{{r_domain.result.qname}}</p>
+            {% for res in r_domain.result %}
+                <p class="text-start m-0">{{res}}</p>
+            {% endfor %}
+            <p class="text-start m-0"><strong>Canonical name: </strong>{{r_domain.result.canonical_name}}</p>
+        {% else %}
+            <p class="text-start m-0"><strong>Domain: </strong>{{r_domain.qname}}</p>
+            <p class="text-start m-0"><strong>Error: </strong>{{r_domain.error}}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+<h5 class="m-5">CDN</h5>
+<div class="row">
+    {% for r_cdn in result_cdn%}
+    <div class="col">
+        {% if r_cdn.query %}
+            <p class="text-start m-0"><strong>Domain: </strong>{{r_cdn.result.qname}}</p>
+            {% for res in r_cdn.result %}
+                <p class="text-start m-0">{{res}}</p>
+            {% endfor %}
+            <p class="text-start m-0"><strong>Canonical name: </strong>{{r_cdn.result.canonical_name}}</p>
+        {% else %}
+            <p class="text-start m-0"><strong>Domain: </strong>{{r_cdn.qname}}</p>
+            <p class="text-start m-0"><strong>Error: </strong>{{r_cdn.error}}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+<h5 class="m-5">HTTP</h5>
+<div class="row">
+    {% for r_http in result_http%}
+    <div class="col">
+        {% if r_http.query %}
+            <p class="text-start m-0"><strong>Domain: </strong>{{r_http.url}}</p>
+            <p class="text-start m-0"><strong>Status Code: </strong>{{r_http.status_code}}</p>
+            {% if r_http.history %}
+                <p class="text-start m-0"><strong>Redirection: </strong>{{r_http.history}}</p>
+            {% endif %}
+            <p class="text-start m-0"><strong>Headers: </strong>{{r_http.headers}}</p>
+        {% else %}
+            <p class="text-start m-0"><strong>Domain: </strong>{{r_http.url}}</p>
+            <p class="text-start m-0"><strong>Error: </strong>{{r_hhtp.error}}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+<h5 class="m-5">HTTP CDN</h5>
+<div class="row">
+    {% for r_http in result_http_cdn%}
+    <div class="col">
+        {% if r_http.query %}
+            <p class="text-start m-0"><strong>Domain: </strong>{{r_http.url}}</p>
+            <p class="text-start m-0"><strong>Status Code: </strong>{{r_http.status_code}}</p>
+            {% if r_http.history %}
+                <p class="text-start m-0"><strong>Redirection: </strong>{{r_http.history}}</p>
+            {% endif %}
+            <p class="text-start m-0"><strong>Headers: </strong>{{r_http.headers}}</p>
+        {% else %}
+            <p class="text-start m-0"><strong>Domain: </strong>{{r_http.url}}</p>
+            <p class="text-start m-0"><strong>Error: </strong>{{r_http.error}}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+{% block back_url %}{% url 'dns_index' %}{% endblock %}

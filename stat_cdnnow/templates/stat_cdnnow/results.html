@@ -1,0 +1,16 @@
+{% extends "cdn/base_results.html" %}
+{% block description_contetnt %}Получение статистики трафика через API{% endblock %}
+{% block title %}Статистика трафика CDNNOW{% endblock %}
+{% block h1 %}Получение статистики трафика через API{% endblock %}
+{% block subheader %}
+    <h2>{{portal}}</h2>
+    <h3>{{period}}</h3>
+{% endblock %}
+{% block content %}
+    {% if plot %}
+    <div class="p-3"><img src="data:image/png;base64,{{plot}}" /></div>
+    {% else %}
+    <div> Нет данных</div>
+    {% endif %}
+{% endblock %}
+{% block back_url %}{% url 'stat_index' %}{% endblock %}

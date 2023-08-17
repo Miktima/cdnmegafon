@@ -1,0 +1,74 @@
+{% extends "cdn/base_index.html" %}
+{% block description_contetnt %}Получение метрик трафика через API{% endblock %}
+{% block title %}Метрики трафика CDNNOW{% endblock %}
+{% block h1 %}Получение метрик трафика через API{% endblock %}
+{% block form_content %}
+<form action="{% url 'metric_results' %}" method="post">
+    {% csrf_token %}
+    <table class="table">
+        <tr>
+            {% if project_list %}
+            <th>
+                <label class="form-label">Портал: </label>
+            </th>
+            <td>
+                <select name="project" class="form-select">
+                    <option value="no_select">---------Выберите портал---------</option>
+                    {% for project in project_list %}
+                        <option value="{{project.project}}">
+                            {{project.portal}}
+                            {% if project.old_project %} (old){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+            {% else %}
+            <td colspan="2"><span>Не заполнен список проектов</span></td>
+            {% endif %}
+        </tr>
+        <tr>
+            <th>
+                <label class="form-label">Период*:</label>
+            </th>
+            <td>
+                <div class="input-group">
+                    <select name="from_year" class="form-select">
+                        {% for year in years %}<option value="{{year}}"{%if year == current_year %} selected{% endif %}>{{year}}</option>{% endfor %}
+                    </select>
+                    <select name="from_month" class="form-select">
+                        {% for month in months %}<option value="{{month}}"{%if month == current_month %} selected{% endif %}>{{month}}</option>{% endfor %}
+                    </select>
+                    <select name="from_day" class="form-select">
+                        {% for day in days %}<option value="{{day}}"{%if day == current_day %} selected{% endif %}>{{day}}</option>{% endfor %}
+                    </select>
+                    <span class="mx-3"> - </span>
+                    <select name="to_year" class="form-select">
+                        {% for year in years %}<option value="{{year}}"{%if year == current_year %} selected{% endif %}>{{year}}</option>{% endfor %}
+                    </select>
+                    <select name="to_month" class="form-select">
+                        {% for month in months %}<option value="{{month}}"{%if month == current_month %} selected{% endif %}>{{month}}</option>{% endfor %}
+                    </select>
+                    <select name="to_day" class="form-select">
+                        {% for day in days %}<option value="{{day}}"{%if day == current_day %} selected{% endif %}>{{day}}</option>{% endfor %}
+                    </select>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}
+{% block back %}
+<div class="text-start pt-5"><a href = "{% url 'main' %}" class="btn btn-info text-white">К списку утилит</a></div>
+{% endblock %}
+{% block description %}
+Для получения метрик трафика портала необходимо указать портал и период. (*) Разбиение периода происходит автоматически в зависимости от его длительности с учетом 
+максимально возможного разбиения в 1440 точек (ограничение API CDNNOW). Выводятся следующие графики:
+<ul>
+    <li>edge_cache_status_hit_ratio - доля успешного возврата контента из кеша CDN, по отношению ко всем запросам (эфективность работы CDN)</li>
+    <li>edge_requests_count - количество запросов на сервера CDN, edge_status_4xx - из них количество запросов, завершаемых ошибками 4хх</li>
+    <li>origin_requests_count - количество запросов на сервер Origin, origin_status_4xx - из них количество запросов, завершаемых ошибками 4хх</li>
+    <li>Отношение edge_requests_count к origin_requests_count, и edge_status_4xx к origin_status_4xx</li>
+</ul>  
+{% endblock %}
+

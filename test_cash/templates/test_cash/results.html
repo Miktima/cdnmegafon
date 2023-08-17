@@ -1,0 +1,26 @@
+{% extends "cdn/base_results.html" %}
+{% block description_contetnt %}Проверка кеширования контента в CDN{% endblock %}
+{% block title %}Кеширование контента в CDN{% endblock %}
+{% block h1 %}Проверка кеширования контента в CDN{% endblock %}
+{% block subheader %}
+    <h2>{{portal}}</h2>
+{% endblock %}
+{% block content %}
+    {% if results %}
+    <table class="table table-striped text-start">
+        <tr><th>URL</th><th>Код</th></tr>
+        {% for link, code in results%}
+            <tr><td><a href="{{link}}">{{link}}</a></td><td>{{code}}</td></tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <div>Результата нет</div>
+    {% endif %}
+    {% for d in debug %}
+    <div>{{d}}</div>
+    {% endfor %}
+    {% for d2 in debug2 %}
+    <div>{{d2}}</div>
+    {% endfor %}
+{% endblock %}
+{% block back_url %}{% url 'cash_index' %}{% endblock %}

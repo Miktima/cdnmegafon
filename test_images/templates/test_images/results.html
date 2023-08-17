@@ -1,0 +1,24 @@
+{% extends "cdn/base_results.html" %}
+{% block description_contetnt %}Проверка загрузки изображений через CDN{% endblock %}
+{% block title %}Загрузка изображений через CDN{% endblock %}
+{% block h1 %}Проверка загрузки изображений через CDN{% endblock %}
+{% block subheader %}
+    {% if old_cdn == new_cdn %}
+        <h2>CDN: {{old_cdn}}</h2>
+    {% else %} 
+        <h2>Старый CDN: {{old_cdn}}, новый CDN {{new_cdn}}</h2>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    {% if bad_list %}
+    <table class="table table-striped text-start">
+        <tr><th>URL</th><th>Код ошибки</th></tr>
+        {% for link, code in bad_list%}
+            <tr><td><a href="{{link}}">{{link}}</a></td><td>{{code}}</td></tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    <div class="mark">{{conclusion}}</div>
+{% endblock %}
+{% block back_url %}{% url 'img_index' %}{% endblock %}
+

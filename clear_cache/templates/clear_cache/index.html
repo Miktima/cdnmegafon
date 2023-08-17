@@ -1,0 +1,28 @@
+{% extends "cdn/base_index.html" %}
+{% block description_contetnt %}Очистка кеша CDN{% endblock %}
+{% block title %}Очистка кеша CDN{% endblock %}
+{% block h1 %}Очистка кеша CDN{% endblock %}
+{% block form_content %}
+    <form action="{% url 'clearcache_results' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table class="table">{{form}}</table>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
+{% block back %}
+<div class="text-start pt-5"><a href = "{% url 'main' %}" class="btn btn-info text-white">К списку утилит</a></div>
+{% endblock %}
+{% block description %}
+<p>Маски очистки кеша:
+    <ul>
+    <li>Если параметр пустой, то очищается весь кеш</li>
+    <li>Можно указать одну маску <code>/img/*</code>
+    Из кеша будут удалены все файлы, начинающиеся на <code>/img/ (/img/one.jpg, /img/two.jpg)</code>.</li>
+    <li>Можно указать несколько масок через запятую <code>/img/*, /video/*</code>
+    Из кеша будут удалены все файлы, начинающиеся на <code>/img/</code> и <code>/video/ (/img/one.jpg, /img/two.jpg, /video/one.mp4, /video/video.avi и т.п.)</code>.</li>
+    <li>Если указать маску без *, то из кеша будет удалён только файл с url, строго совпадающий с маской.
+    К примеру, <code>masks=/img/my_super_image.jpg?id=8193737182253</code>
+    Из кеша будет удалён файл, url которого строго совпадает с <code>/img/my_super_image.jpg?id=8193737182253</code>.</li>
+    </ul>
+</p>
+{% endblock %}

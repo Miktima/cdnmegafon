@@ -1,0 +1,23 @@
+{% extends "cdn/base_index.html" %}
+{% block description_contetnt %}Проверка загрузки изображений через CDN{% endblock %}
+{% block title %}Загрузка изображений через CDN{% endblock %}
+{% block h1 %}Проверка загрузки изображений через CDN{% endblock %}
+{% block form_content %}
+    <form action="{% url 'img_results' %}" method="post">
+        {% csrf_token %}
+        <table class="table">{{form}}</table>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
+{% block back %}
+<div class="text-start pt-5"><a href = "{% url 'main' %}" class="btn btn-info text-white">К списку утилит</a></div>
+{% endblock %}
+{% block description %}
+<p>В поле <em>Page URL</em> требуется ввести URL тестируемой страницы портала Sputnik, в поле <em>CDN on the page</em> - домен CDN, 
+используемый на тестируемой странице. Домен CDN можно получить, открыв исходный текст тестируемой страницы. Например, в ссылке на изображение 
+<code>https://<mark>cdn1.img.sputniknews.com.tr</mark>/img/07e7/01/0d/1065715712_0:0:1536:864_1920x0_80_0_0_a64c0583379bdf20f66e30fbbc5be8c1.jpg.webp</code>
+ выделен домен CDN. </p>
+ <p>Если поле <em>New CDN</em> оставить пустым, то проверка загрузки избражений происходит по домену CDN из тестируемой страницы. Если указать новый CDN домен 
+в поле <em>New CDN</em>, то все ссылки из тестрируемой страницы, использующие старый CDN, будут проверены на новом домене</p>
+<p>В результате выводятся ссылки на страницы с ошибкой 404 и процент ошибок</p>
+{% endblock %}

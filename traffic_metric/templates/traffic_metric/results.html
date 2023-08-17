@@ -1,0 +1,20 @@
+{% extends "cdn/base_results.html" %}
+{% block description_contetnt %}Получение метрик трафика через API{% endblock %}
+{% block title %}Метрики трафика CDNNOW{% endblock %}
+{% block h1 %}Получение метрик трафика через API{% endblock %}
+{% block subheader %}
+    <h2>{{origin}}</h2>
+    <h3>{{from_date}} - {{to_date}}</h3>
+{% endblock %}
+{% block content %}
+    {% if plot_edge_cash %}
+        <div class="p-3"><img src="data:image/png;base64,{{plot_edge_cash}}" /></div>
+        <div class="p-3"><img src="data:image/png;base64,{{plot_edge_requests}}" /></div>
+        <div class="p-3"><img src="data:image/png;base64,{{plot_origin_requests}}" /></div>
+        <div class="p-3"><img src="data:image/png;base64,{{plot_ratio_requests}}" /></div>
+    {% else %}
+        <div> Нет данных</div>
+    {% endif %}
+{% endblock %}
+{% block back_url %}{% url 'metric_index' %}{% endblock %}
+

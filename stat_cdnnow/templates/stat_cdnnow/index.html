@@ -1,0 +1,57 @@
+{% extends "cdn/base_index.html" %}
+{% block description_contetnt %}Получение статистики трафика через API{% endblock %}
+{% block title %}Статистика трафика CDNNOW{% endblock %}
+{% block h1 %}Получение статистики трафика через API{% endblock %}
+{% block form_content %}
+<form action="{% url 'stat_results' %}" method="post">
+    {% csrf_token %}
+    <table class="table">
+        <tr>
+            {% if portal_list %}
+            <th>
+                <label class="form-label">Портал: </label>
+            </th>
+            <td>
+                <select name="portal" class="form-select">
+                    <option value="no_select">----Выберите портал----</option>
+                    {% for portal in portal_list %}
+                        <option value="{{portal.id_portal}}">
+                            {{portal.portal}}
+                            {% if portal.old_project %} (old){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+            {% else %}
+            <td colspan="2"><span>Не заполнен список порталов</span></td>
+            {% endif %}
+        </tr>
+        <tr>
+            <th>
+                <label class="form-label">Период*:</label>
+            </th>
+            <td>
+                <div class="input-group">
+                <select name="year" class="form-select">
+                {% for year in years %}<option value="{{year}}"{%if year == current_year %} selected{% endif %}>{{year}}</option>{% endfor %}
+                </select>
+                <select name="month" class="form-select">
+                {% for month in months %}<option value="{{month}}"{%if month == current_month %} selected{% endif %}>{{month}}</option>{% endfor %}
+                </select>
+                <select name="day" class="form-select">
+                <option value="no">Все даты</option>
+                {% for day in days %}<option value="{{day}}"{%if day == current_day %} selected{% endif %}>{{day}}</option>{% endfor %}
+                </select></div>
+            </td>
+        </tr>
+    </table>
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}
+{% block back %}
+<div class="text-start pt-5"><a href = "{% url 'main' %}" class="btn btn-info text-white">К списку утилит</a></div>
+{% endblock %}
+{% block description %}
+Для получения статистики трафика (переданный объем трафика CDN) необходимо выбрать портал и период. (*) Статистика собирается за указанный день, или за месяц, если день не указан
+{% endblock %}
+

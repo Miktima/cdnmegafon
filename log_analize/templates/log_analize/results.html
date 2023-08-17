@@ -1,0 +1,58 @@
+{% extends "cdn/base_results.html" %}
+{% block description_contetnt %}Анализ лог файла CDN{% endblock %}
+{% block title %}Анализ лог файла CDN{% endblock %}
+{% block h1 %}Анализ лог файла CDN{% endblock %}
+{% block subheader %}
+    <h2>CDN: {{filename}}</h2>
+{% endblock %}
+{% block content %}
+    {% if request_uri_plot %}
+        <h3>Request URI</h3>
+        <table class="table table-striped text-start">
+            <tr><th>Номер</th><th>Request URI</th><th>Количество</th></tr>
+            {% for uri, value in request_uri_links.items %}
+                <tr><td>{{forloop.counter}}</td><td>{{uri}}</td><td>{{value}}</td></tr>
+            {% endfor %}
+        </table>
+        <div class="p-3"><img src="data:image/png;base64,{{request_uri_plot}}" /></div>
+    {% else %}
+        <div> Нет данных по request_uri</div>
+    {% endif %}
+    {% if http_user_agent_plot %}
+        <h3>HTTP User agent</h3>
+        <table class="table table-striped text-start">
+            <tr><th>Номер</th><th>HTTP User agent</th><th>Количество</th></tr>
+            {% for agent, value in http_user_agent_links.items %}
+                <tr><td>{{forloop.counter0}}</td><td>{{agent}}</td><td>{{value}}</td></tr>
+            {% endfor %}
+        </table>
+        <div class="p-3"><img src="data:image/png;base64,{{http_user_agent_plot}}" /></div>
+    {% else %}
+        <div> Нет данных по http_user_agent</div>
+    {% endif %}
+    {% if http_referer_plot %}
+        <h3>HTTP Referer</h3>
+        <table class="table table-striped text-start">
+            <tr><th>Номер</th><th>HTTP Referer</th><th>Количество</th></tr>
+            {% for referer, value in http_referer_links.items %}
+                <tr><td>{{forloop.counter0}}</td><td>{{referer}}</td><td>{{value}}</td></tr>
+            {% endfor %}
+        </table>
+        <div><img src="data:image/png;base64,{{http_referer_plot}}" /></div>
+    {% else %}
+        <div> Нет данных по http_referer</div>
+    {% endif %}
+    {% if error404_plot %}
+        <h3>Request URI - Error 404</h3>
+        <table class="table table-striped text-start">
+            <tr><th>Номер</th><th>Request URI</th><th>Количество</th></tr>
+            {% for uri, value in error404_links.items %}
+                <tr><td>{{forloop.counter0}}</td><td>{{uri}}</td><td>{{value}}</td></tr>
+            {% endfor %}
+        </table>
+        <div><img src="data:image/png;base64,{{error404_plot}}" /></div>
+    {% else %}
+        <div> Нет данных по Request URI - Error 404</div>
+    {% endif %}
+{% endblock %}
+{% block back_url %}{% url 'log_index' %}{% endblock %}
