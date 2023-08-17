@@ -52,6 +52,7 @@ def results(request):
         return HttpResponseRedirect(reverse('metric_index'))        
     objTraffic = Trafficsite()
     # Получение метрик или вывод ошибки в первоначальную форму
+    project = 1
     if objTraffic.get_traffic_metric(project, from_date, to_date) != False:
         result = objTraffic.get_traffic_metric(project, from_date, to_date)
     else:
@@ -116,7 +117,7 @@ def results(request):
         "plot_edge_requests": edge_requests,
         "plot_origin_requests": origin_requests,
         "plot_ratio_requests": ratio_requests,
-        "origin": project_obj.origin,
+        "origin": 1,
         "from_date": from_date.strftime("%d/%m/%Y"),
         "to_date": to_date.strftime("%d/%m/%Y")
     }
