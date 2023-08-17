@@ -1,11 +1,9 @@
 import requests
-import json
-from .models import Stat_settings
 
 class Statsite:
     def __init__(self):
     # Определяем параметры запросов
-        settings = Stat_settings.objects.first()
+        settings = 1
         self.login = settings.login
         self.password = settings.password
         self.id_client = settings.client_id

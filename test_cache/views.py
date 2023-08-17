@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import CashForm
+from .forms import CacheForm
 from .Test_Cash import TestCashSite
 from django.contrib import messages
 import requests
@@ -8,25 +8,25 @@ import time
 import random
 
 def index(request):
-    form = CashForm()
+    form = CacheForm()
     return render(request, "test_cash/index.html", {'form': form})
 
 def results(request):
     if request.method == 'POST':
-        form = CashForm(request.POST)
+        form = CacheForm(request.POST)
         if form.is_valid():
             page_url = request.POST['page_url']
             cdn = request.POST['cdn']
             # Проверка , что в поле CDN нет слешей
             if cdn.find("/") >= 0:
                 messages.error(request, 'поле CDN не должно содержать слешей!')
-                form = CashForm()
+                form = CacheForm()
                 return render(request, "test_cash/index.html", {'form': form})
             # Загружаем тестируемую страницу и проверяем, что она загрузилась
             response = requests.get(page_url, verify=False)
             if response.status_code != 200:
                 messages.error(request, 'Страница не может быть загружена!')
-                form = CashForm()
+                form = CacheForm()
                 return render(request, "test_cash/index.html", {'form': form})
             # Получаем текст страницы
             source = response.text
@@ -43,7 +43,7 @@ def results(request):
             # Если ссылок не найдено, переходим к форме
             if lenlist == 0:
                 messages.error(request, 'ERROR: CDN content was not be found on the page!')
-                form = CashForm()
+                form = CacheForm()
                 return render(request, "test_cash/index.html", {'form': form})
             # Если ссылок меньше или равно 10 копируем все и удаляем те, которые заканчиваются на слеш
             elif lenlist > 0 and lenlist <= 10:
@@ -79,7 +79,7 @@ def results(request):
                 objTest = TestCashSite(domain)
             else:
                 messages.error(request, TestCashSite(domain).error)
-                form = CashForm()
+                form = CacheForm()
                 return render(request, "test_cash/index.html", {'form': form})
             if objTest.get_token() != False:
                 token = objTest.get_token()
@@ -93,7 +93,7 @@ def results(request):
                     if i == 9:
                         # Если невозможно получить положительный статус, рекомендуется проверить статус на сайте CDNNOW
                         messages.error(request, "Невозможно получить положительный статус. Проверьте статус на CDNNOW")
-                        form = CashForm()
+                        form = CacheForm()
                         return render(request, "test_cash/index.html", {'form': form})
                 # Проверяем статус запроса каждые 5 секунд
                 if objTest.test_link(token, links):
@@ -109,11 +109,11 @@ def results(request):
                     objTest.terminate_test(token)
                 else:
                     messages.error(request, objTest.error)
-                    form = CashForm()
+                    form = CacheForm()
                     return render(request, "test_cash/index.html", {'form': form})
             else:
                 messages.error(request, "Невозможно получить токен")
-                form = CashForm()
+                form = CacheForm()
                 return render(request, "test_cash/index.html", {'form': form})
         context = {
             "portal": domain,
@@ -121,5 +121,5 @@ def results(request):
         }
         return render(request, "test_cash/results.html", context)
     else:
-        form = CashForm()
+        form = CacheForm()
         return render(request, "test_cash/index.html", {'form': form})

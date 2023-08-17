@@ -1,12 +1,10 @@
 import requests
 import re
-from test_cash.models import Cash_settings
-from stat_cdnnow.models import Portals_stat
 
 class ClearCache:
     def __init__(self, portal):
     # Определяем параметры запросов
-        settings = Cash_settings.objects.first()
+        settings = 1
         self.login = settings.login
         self.password = settings.password
         self.cdnnow_urlauth = settings.url_auth
@@ -14,12 +12,12 @@ class ClearCache:
         self.cdnnow_url_request = re.sub("/v4/cache", "/v1/projects", self.cdnnow_url_request)
         self.error = ""
         # получаем идентификатор для домена - домен должен быть в базе данных
-        try:
-            portal_obj = Portals_stat.objects.get(portal=portal)
-        except Portals_stat.DoesNotExist:
-            self.error = 'Идентификатор для домена ' + portal + ' не найден'
-        else:
-            self.id_portal = portal_obj.id_portal
+        # try:
+        #     portal_obj = Portals_stat.objects.get(portal=portal)
+        # except Portals_stat.DoesNotExist:
+        #     self.error = 'Идентификатор для домена ' + portal + ' не найден'
+        # else:
+        #     self.id_portal = portal_obj.id_portal
 
     def get_token(self):
         # Получаем токен для последующих запросов

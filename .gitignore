@@ -3,3 +3,11 @@
 key.txt
 cdn/secret_key.txt
 cdn/settings.py
+cdn/__pycache__/
+dnsheader/__pycache__/
+clear_cache/__pycache__/
+log_analyse/__pycache__/
+stat_cdnnow/__pycache__/
+test_cache/__pycache__/
+test_images/__pycache__/
+traffic_metric/__pycache__/

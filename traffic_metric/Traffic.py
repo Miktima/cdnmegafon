@@ -1,12 +1,11 @@
 import requests
 from datetime import date
-from .models import Granularity, Metric_settings, Metrics
 
 class Trafficsite:
     def __init__(self):
         # Результирующее число точек, которое определятся как разница между from/to деленое на granularity не должно превышать 1440.
         self.max_point = 1440
-        granula_list = Granularity.objects.all().order_by('nsec') 
+        granula_list = 1 
         self.gran = {}
         for g in granula_list:
             self.gran.update({g.nsec:g.code})
@@ -16,11 +15,11 @@ class Trafficsite:
             "values": "userXXXXX"
         }]
         self.group_by = ["cname"]
-        metrics_obj = Metrics.objects.all()
+        metrics_obj = 1
         self.metrics = []
         for m in metrics_obj:
             self.metrics.append(m.name)
-        settings = Metric_settings.objects.first()
+        settings = 1
         self.cdnnow_url = settings.url_metric
         self.token = settings.token
         self.error = ""

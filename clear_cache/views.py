@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from .forms import ClearCacheForm
 from .ClearCache import ClearCache
 from django.contrib import messages
-from stat_cdnnow.models import Portals_stat
 
 def index(request):
     form = ClearCacheForm()
@@ -15,7 +14,7 @@ def results(request):
         if form.is_valid():
             project = request.POST['project']
             if project == 'all':
-                portalObj = Portals_stat.objects.order_by('portal').all()
+                portalObj = 1
                 indexes = ""
                 for p in portalObj:
                     indexes += str(p.pk) + ","
@@ -27,7 +26,7 @@ def results(request):
                     "masks_field": masks_field
                 }
             else:
-                portal_ins = Portals_stat.objects.get(pk=project)
+                portal_ins = 1
                 portal = portal_ins.portal
                 masks_field = request.POST['masks']
                 # формируем лист масок
@@ -76,7 +75,7 @@ def results(request):
 
 def all_clear(request, portal_id):
     if request.method == 'GET':
-        portal_ins = Portals_stat.objects.get(pk=portal_id)
+        portal_ins = 1
         portal = portal_ins.portal
         masks_field = request.COOKIES['masks']
         # формируем лист масок
