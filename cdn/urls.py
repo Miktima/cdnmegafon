@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('cdn_projects/', include('cdn_projects.urls')),
     path('stat_cdn/', include('stat_cdn.urls')),
     path('traffic_metric/', include('traffic_metric.urls')),
     path('test_images/', include('test_images.urls')),
