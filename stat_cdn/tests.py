@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
-from stat_cdnnow.models import Portals_stat
+from stat_cdn.models import Portals_stat
 
-class StatCdnnowTests(TestCase):
+class StatCdnTests(TestCase):
     def setUp(self):
         self.client = Client()
     def test_portal_exist(self):

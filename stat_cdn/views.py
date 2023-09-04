@@ -37,7 +37,7 @@ def index(request):
         'current_month': current_month,
         'current_day': current_day
     }
-    return render(request, "stat_cdnnow/index.html", context)
+    return render(request, "stat_cdn/index.html", context)
 
 def results(request):
     portal_id = request.POST['portal']
@@ -84,4 +84,4 @@ def results(request):
         "plot": data_plot,
         "period": period
     }
-    return render(request, 'stat_cdnnow/results.html', context)
+    return render(request, 'stat_cdn/results.html', context)

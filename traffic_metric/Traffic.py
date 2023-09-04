@@ -20,7 +20,7 @@ class Trafficsite:
         for m in metrics_obj:
             self.metrics.append(m.name)
         settings = 1
-        self.cdnnow_url = settings.url_metric
+        self.cdn_url = settings.url_metric
         self.token = settings.token
         self.error = ""
 
@@ -61,7 +61,7 @@ class Trafficsite:
             "filter_by": self.filter_by,
             "group_by": self.group_by
         }
-        response = requests.post(self.cdnnow_url, headers={"x-auth-token": self.token}, json=request_data)
+        response = requests.post(self.cdn_url, headers={"x-auth-token": self.token}, json=request_data)
         if response.status_code == 200:
             return (response.json())["data"][project]
         else:

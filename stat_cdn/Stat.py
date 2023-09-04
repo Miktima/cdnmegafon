@@ -7,8 +7,8 @@ class Statsite:
         self.login = settings.login
         self.password = settings.password
         self.id_client = settings.client_id
-        self.cdnnow_urlauth = settings.url_auth
-        self.cdnnow_urlstat = settings.url_stat
+        self.cdn_urlauth = settings.url_auth
+        self.cdn_urlstat = settings.url_stat
         
     def get_token(self):
         # Получаем токен для последующих запросов
@@ -16,7 +16,7 @@ class Statsite:
             'username': self.login,
             'password': self.password
         }
-        response = requests.post(self.cdnnow_urlauth, data = login_data)
+        response = requests.post(self.cdn_urlauth, data = login_data)
         if (response.json())["status"] != "ok":
             print ("ERROR: response status:", response.json())
             return False
@@ -35,7 +35,7 @@ class Statsite:
         }
         if stat_period[2] != "":
             request_data.update({"day": stat_period[2]})
-        response = requests.get(self.cdnnow_urlstat, params = request_data)
+        response = requests.get(self.cdn_urlstat, params = request_data)
         if response.status_code == 200:
             return (response.json())["data"]["data"]
         else:

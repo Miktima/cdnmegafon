@@ -8,9 +8,9 @@ class TestCashSite:
         settings = 1
         self.login = settings.login
         self.password = settings.password
-        self.cdnnow_urlauth = settings.url_auth
-        self.cdnnow_url_status = settings.url_status
-        self.cdnnow_url_request = settings.url_request
+        self.cdn_urlauth = settings.url_auth
+        self.cdn_url_status = settings.url_status
+        self.cdn_url_request = settings.url_request
         self.error = ""
         # получаем идентификатор для домена - домен должен быть в базе данных
         # try:
@@ -26,7 +26,7 @@ class TestCashSite:
             'username': self.login,
             'password': self.password
         }
-        response = requests.post(self.cdnnow_urlauth, data = login_data)
+        response = requests.post(self.cdn_urlauth, data = login_data)
         if (response.json())["status"] != "ok":
             self.error = "ERROR: response status:", response.json()
             return False
@@ -36,7 +36,7 @@ class TestCashSite:
     
     def get_status(self, token):
         # Статус сервиса для отправки запроса в API
-        url = (self.cdnnow_url_status).replace("##portal##", self.id_portal)
+        url = (self.cdn_url_status).replace("##portal##", self.id_portal)
         response = requests.get(url, headers = {'token': token})
         if (response.json())["runstate"] == "busy":
             self.error = "ERROR: service busy"
@@ -48,7 +48,7 @@ class TestCashSite:
         # Формируем запрос для проверки надбора линков
         links = {}
         links.update({"paths" : list_link})
-        url = (self.cdnnow_url_request).replace("##portal##", self.id_portal)
+        url = (self.cdn_url_request).replace("##portal##", self.id_portal)
         response = requests.post(url, headers = {'token': token}, json = links)
         if response.status_code == 202:
             return True
@@ -58,7 +58,7 @@ class TestCashSite:
     
     def check_test_status(self, token):
         # Проверка статуса выполнения задачи: "pending", "running", "passed"
-        url = (self.cdnnow_url_request).replace("##portal##", self.id_portal)
+        url = (self.cdn_url_request).replace("##portal##", self.id_portal)
         response = requests.get(url, headers = {'token': token})
         return (response.json())["status"]
     
@@ -67,12 +67,12 @@ class TestCashSite:
         # Массив результатов проверки каждого URL-пути. Ключ содержит URL-путь, значение - поля:
         #   "checked" - boolean, завершена (true) или выполняется (false) проверка данного URL-пути,
         #   "errors"  - строковый массив, содержащий текстовые сообщения об ошибках проверки.
-        url = (self.cdnnow_url_request).replace("##portal##", self.id_portal)
+        url = (self.cdn_url_request).replace("##portal##", self.id_portal)
         response = requests.get(url, headers = {'token': token})
         if (response.json())["status"] == "passed":
             return (response.json())["paths"]
     
     def terminate_test(self, token):
         # Завершает либо прерывает текущую задачу, освобождая сервис для следующих запросов.
-        url = (self.cdnnow_url_request).replace("##portal##", self.id_portal)
+        url = (self.cdn_url_request).replace("##portal##", self.id_portal)
         requests.delete(url, headers = {'token': token})

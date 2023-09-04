@@ -2,7 +2,8 @@ from django.shortcuts import render
 
 def index(request):
     applications = {
-        "stat_cdnnow/": "Получение статистики трафика через API",
+        "cdn_projects/": "Список проектов CDN",
+        "stat_cdn/": "Получение статистики трафика через API",
         "traffic_metric/": "Получение метрик трафика через API",
         "test_images/": "Проверка загрузки изображений через CDN",
         "test_cache/": "Проверка кеширования контента в CDN",
