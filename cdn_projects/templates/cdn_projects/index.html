@@ -1,0 +1,38 @@
+{% extends "cdn/base_results.html" %}
+{% block description_contetnt %}Список проектов CDN{% endblock %}
+{% block title %}Список проектов CDN{% endblock %}
+{% block h1 %}Список проектов CDN{% endblock %}
+{% block subheader %}
+{% if response %}
+    Количество ресурсов: {{ response|length }}
+{% endif %}
+{% endblock %}
+{% block content %}
+
+{% if status_code != 200 %}
+<div class="alert alert-danger" role="alert">
+    Ошибка запроса: {{status_code}}
+</div>
+{% endif %}
+{% if response %}
+{{ sources }}
+<table class="table table-striped">
+    <thead>
+        <th scope="col">ID</th>
+        <th scope="col">Description</th>
+        <th scope="col">Origin</th>
+        <th scope="col">CDN</th>
+    </thead>
+    <tbody>
+    {% for r in response %}
+        <tr>
+            <th scope="row">{{ r.id }}</th>
+            <td>{{ r.description }}</td>
+            <td>{{ r.originGroup }}</td>
+            <td>{{ r.cname }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
