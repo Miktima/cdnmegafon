@@ -15,7 +15,6 @@
 </div>
 {% endif %}
 {% if response %}
-{{ sources }}
 <table class="table table-striped">
     <thead>
         <th scope="col">ID</th>
@@ -28,7 +27,7 @@
         <tr>
             <th scope="row">{{ r.id }}</th>
             <td>{{ r.description }}</td>
-            <td>{{ r.originGroup }}</td>
+            <td>{{ r.origin }}</td>
             <td>{{ r.cname }}</td>
         </tr>
     {% endfor %}
