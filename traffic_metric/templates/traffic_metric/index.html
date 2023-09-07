@@ -16,8 +16,7 @@
                     <option value="no_select">---------Выберите портал---------</option>
                     {% for project in project_list %}
                         <option value="{{project.project}}">
-                            {{project.portal}}
-                            {% if project.old_project %} (old){% endif %}
+                            {{project.description}}
                         </option>
                     {% endfor %}
                 </select>
@@ -54,6 +53,19 @@
                 </div>
             </td>
         </tr>
+        <tr>
+            <th>
+                <label class="form-label">Метрики:</label>
+            </th>
+            <td>
+                <select name="metrics" class="form-select" multiple>
+                    <option value="no_select">---------Выберите метрики---------</option>
+                    {% for m in metrics %}
+                        <option value="{{m}}">{{m}}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
     </table>
     <input type="submit" value="Submit">
 </form>
@@ -62,13 +74,31 @@
 <div class="text-start pt-5"><a href = "{% url 'main' %}" class="btn btn-info text-white">К списку утилит</a></div>
 {% endblock %}
 {% block description %}
-Для получения метрик трафика портала необходимо указать портал и период. (*) Разбиение периода происходит автоматически в зависимости от его длительности с учетом 
-максимально возможного разбиения в 1440 точек (ограничение API CDN). Выводятся следующие графики:
+Для получения метрик трафика портала необходимо указать портал, период и метрики (можно несколько). (*) Разбиение периода происходит автоматически в зависимости от его длительности с учетом 
+максимально возможного разбиения в 1440 точек (ограничение API CDN). Список метрик:
 <ul>
-    <li>edge_cache_status_hit_ratio - доля успешного возврата контента из кеша CDN, по отношению ко всем запросам (эфективность работы CDN)</li>
-    <li>edge_requests_count - количество запросов на сервера CDN, edge_status_4xx - из них количество запросов, завершаемых ошибками 4хх</li>
-    <li>origin_requests_count - количество запросов на сервер Origin, origin_status_4xx - из них количество запросов, завершаемых ошибками 4хх</li>
-    <li>Отношение edge_requests_count к origin_requests_count, и edge_status_4xx к origin_status_4xx</li>
+    <li>upstream_bytes — to get traffic in bytes from the source to the CDN servers or from the source to the shielding</li>
+    <li>sent_bytes — to get traffic in bytes from CDN servers to the end users</li>
+    <li>shield_bytes — to get traffic in bytes from shielding to CDN servers</li>
+    <li>total_bytes — to get the sum of shield_bytes, upstream_bytes and sent_bytes traffic</li>
+    <li>cdn_bytes — to get the sum of sent_bytes and shield_bytes traffic</li>
+    <li>requests — to get the number of requests to the CDN servers</li>
+    <li>requests_waf_passed — to get the number of requests that were processed by the Basic WAF option</li>
+    <li>responses_2xx — to get the number of 2xx HTTP response status codes</li>
+    <li>responses_3xx — to get the number of 3xx HTTP response status codes</li>
+    <li>responses_4xx — to get the number of 4xx HTTP response status codes</li>
+    <li>responses_5xx — to get the number of 5xx HTTP response status codes</li>
+    <li>responses_hit — to get the number of responses with the HTTP header Cache: HIT</li>
+    <li>responses_miss — to get the number of responses with the HTTP header Cache: MISS</li>
+    <li>response_types — to get the statistics by content type. Returns a number of responses for content with different MIME types</li>
+    <li>cache_hit_traffic_ratio — to get the amount of cached traffic. It is calculated by the formula: one minus upstream_bytes 
+    divided by sent_bytes. We subtract the non-cached traffic from the total traffic</li>
+    <li>cache_hit_requests_ratio — to get the amount of cached content that is sent. 
+    It is calculated by the formula: responses_hit divided by requests</li>
+    <li>shield_traffic_ratio — to get the efficiency of shielding: 
+    how much more traffic is sent from shielding rather than from the source. It is calculated by the formula: 
+    (shield_bytes minus upstream_bytes) divided by shield_bytes</li>
+    <li>image_processed — to get the number of images processed by the Image optimization option</li>
 </ul>  
 {% endblock %}
 

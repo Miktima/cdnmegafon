@@ -3,9 +3,11 @@ from datetime import date
 from .Traffic import Trafficsite
 import pandas as pd
 import json
+import requests
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.conf import settings
 
 from io import BytesIO
 import base64
@@ -17,7 +19,19 @@ import matplotlib.dates as mdates
 
 def index(request):
     # Заполняем список проектов (порталов), для работы с API использется имя портала
-    project_list = 1
+    headers = {'Authorization': 'APIKey ' + settings.APIKEY}
+    # Выборка ресурсов
+    resources = requests.get(settings.APIURLS['urlResources'], headers=headers)
+    status_code = resources.status_code
+    if status_code != 200:
+        messages.error(request, "Ошибка выборки порталов: " + status_code)
+    res = resources.json()
+    portal_list = []
+    for r in res:
+        resDict = {}
+        resDict["id"] = r["id"]
+        resDict["description"] = r["description"]
+        portal_list.append(resDict)
     # Заполняем списки для дат
     years = [2021, 2022, 2023]
     months = []
@@ -31,13 +45,14 @@ def index(request):
     current_month = int(td.strftime("%m"))
     current_day = int(td.strftime("%d"))
     context = {
-        'project_list': project_list,
+        'project_list': portal_list,
         'years': years,
         'months': months,
         'days': days,
         'current_year': current_year,
         'current_month': current_month,
-        'current_day': current_day
+        'current_day': current_day,
+        'metrics': settings.APIMETRICS
     }
     return render(request, "traffic_metric/index.html", context)
 

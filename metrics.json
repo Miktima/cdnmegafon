@@ -1,0 +1,20 @@
+[
+    "upstream_bytes",
+    "sent_bytes",
+    "shield_bytes",
+    "total_bytes",
+    "cdn_bytes",
+    "requests",
+    "requests_waf_passed",
+    "responses_2xx",
+    "responses_3xx",
+    "responses_4xx",
+    "responses_5xx",
+    "responses_hit",
+    "responses_miss",
+    "response_types",
+    "cache_hit_traffic_ratio",
+    "cache_hit_requests_ratio",
+    "shield_traffic_ratio",
+    "image_processed"
+]
