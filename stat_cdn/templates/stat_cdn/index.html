@@ -15,9 +15,8 @@
                 <select name="portal" class="form-select">
                     <option value="no_select">----Выберите портал----</option>
                     {% for portal in portal_list %}
-                        <option value="{{portal.id_portal}}">
-                            {{portal.portal}}
-                            {% if portal.old_project %} (old){% endif %}
+                        <option value="{{portal.id}}">
+                            {{portal.description}}
                         </option>
                     {% endfor %}
                 </select>
@@ -28,18 +27,27 @@
         </tr>
         <tr>
             <th>
-                <label class="form-label">Период*:</label>
+                <label class="form-label">Период:</label>
             </th>
             <td>
-                <div class="input-group">
-                <select name="year" class="form-select">
+                <div class="input-group"><span class="pe-5">с</span> 
+                <select name="from_year" class="form-select">
                 {% for year in years %}<option value="{{year}}"{%if year == current_year %} selected{% endif %}>{{year}}</option>{% endfor %}
                 </select>
-                <select name="month" class="form-select">
+                <select name="from_month" class="form-select">
                 {% for month in months %}<option value="{{month}}"{%if month == current_month %} selected{% endif %}>{{month}}</option>{% endfor %}
                 </select>
-                <select name="day" class="form-select">
-                <option value="no">Все даты</option>
+                <select name="from_day" class="form-select">
+                {% for day in days %}<option value="{{day}}"{%if day == current_day %} selected{% endif %}>{{day}}</option>{% endfor %}
+                </select>
+                <span class="px-5">по</span> 
+                <select name="to_year" class="form-select">
+                {% for year in years %}<option value="{{year}}"{%if year == current_year %} selected{% endif %}>{{year}}</option>{% endfor %}
+                </select>
+                <select name="to_month" class="form-select">
+                {% for month in months %}<option value="{{month}}"{%if month == current_month %} selected{% endif %}>{{month}}</option>{% endfor %}
+                </select>
+                <select name="to_day" class="form-select">
                 {% for day in days %}<option value="{{day}}"{%if day == current_day %} selected{% endif %}>{{day}}</option>{% endfor %}
                 </select></div>
             </td>
@@ -52,6 +60,7 @@
 <div class="text-start pt-5"><a href = "{% url 'main' %}" class="btn btn-info text-white">К списку утилит</a></div>
 {% endblock %}
 {% block description %}
-Для получения статистики трафика (переданный объем трафика CDN) необходимо выбрать портал и период. (*) Статистика собирается за указанный день, или за месяц, если день не указан
+Для получения статистики трафика (переданный объем трафика CDN) необходимо выбрать портал и период. Гранулярность разбиения выбранного периода 
+выбирается автоматически. Выводятся данные по трафику от CDN серверов до конечных пользователей
 {% endblock %}
 

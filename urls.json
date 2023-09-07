@@ -2,5 +2,6 @@
     "urlService": "https://api.lk.cdn.megafon.ru/cdn/clients/me",
     "urlServiceFeatures": "https://api.lk.cdn.megafon.ru/cdn/clients/me/features",
     "urlSourceGroups": "https://api.lk.cdn.megafon.ru/cdn/source_groups",
-    "urlResources": "https://api.lk.cdn.megafon.ru/cdn/resources"
+    "urlResources": "https://api.lk.cdn.megafon.ru/cdn/resources",
+    "urlResStat": "https://api.lk.cdn.megafon.ru/cdn/statistics/series"
 }
