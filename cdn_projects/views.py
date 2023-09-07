@@ -17,8 +17,12 @@ def index(request):
     for r in res:
         resDict = {}
         resDict["id"] = r["id"]
-        resDict["descrition"] = r["description"]
+        resDict["description"] = r["description"]
         resDict["cname"] = r["cname"]
+        # Выбираем все CNAME, если не один
+        if len(r["secondaryHostnames"]) > 0:
+            for secCname in r["secondaryHostnames"]:
+                resDict["cname"] += "; " + secCname
         # Выбираем по номеру группы источников сами источники, чтобы потом вставить в таблицу
         for s in sour:
             if r["originGroup"] == s["id"]:
