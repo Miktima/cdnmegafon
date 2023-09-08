@@ -12,3 +12,4 @@ stat_cdn/__pycache__/
 test_cache/__pycache__/
 test_images/__pycache__/
 traffic_metric/__pycache__/
+cdn_projects/migrations/__pycache__/

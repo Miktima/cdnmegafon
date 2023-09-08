@@ -1,21 +1,13 @@
 from django.shortcuts import render
 from datetime import date
-from .Traffic import Trafficsite
-import pandas as pd
-import json
+from stat_cdn.Stat import Statsite
+from stat_cdn.MetricPlot import MetricPlot
 import requests
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.conf import settings
 
-from io import BytesIO
-import base64
-
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-import matplotlib.dates as mdates
 
 def index(request):
     # Заполняем список проектов (порталов), для работы с API использется имя портала
@@ -45,7 +37,7 @@ def index(request):
     current_month = int(td.strftime("%m"))
     current_day = int(td.strftime("%d"))
     context = {
-        'project_list': portal_list,
+        'portal_list': portal_list,
         'years': years,
         'months': months,
         'days': days,
@@ -57,6 +49,14 @@ def index(request):
     return render(request, "traffic_metric/index.html", context)
 
 def results(request):
+    portal_id = request.POST['portal']
+    if portal_id == 'no_select':
+        messages.error(request, 'Требуется выбрать портал')
+        return HttpResponseRedirect(reverse('metric_index'))       
+    metrics_list = request.POST.getlist('metrics')
+    if len(metrics_list) == 0:
+        messages.error(request, 'Хотя бы одна метрика должна быть выбрана')
+        return HttpResponseRedirect(reverse('metric_index'))            
     # Формируем начальную и конечную дату получения метрик
     # Для начальной даты время идет с 0 часов, для конечной даты время устанавливается 23-59
     from_date = date(int(request.POST['from_year']), int(request.POST['from_month']), int(request.POST['from_day']))
@@ -65,74 +65,32 @@ def results(request):
     if from_date > to_date:
         messages.error(request, 'Дата начала периода должна быть меньше даты окончания')
         return HttpResponseRedirect(reverse('metric_index'))        
-    objTraffic = Trafficsite()
+    # Вытаскиваем CDN портала
+    headers = {'Authorization': 'APIKey ' + settings.APIKEY}
+    # Выборка ресурсов
+    resources = requests.get(settings.APIURLS['urlResources'] + "/" + portal_id, headers=headers)
+    status_code = resources.status_code
+    if status_code != 200:
+        messages.error(request, "Ошибка выборки портала: " + str(status_code))
+    res = resources.json()
+    portal = res["cname"]
+    if len(res["secondaryHostnames"]) > 0:
+        for secCname in res["secondaryHostnames"]:
+            portal += "; " + secCname
+    objStat= Statsite()
     # Получение метрик или вывод ошибки в первоначальную форму
-    project = 1
-    if objTraffic.get_traffic_metric(project, from_date, to_date) != False:
-        result = objTraffic.get_traffic_metric(project, from_date, to_date)
-    else:
-        messages.error(request, objTraffic.error)
-        return HttpResponseRedirect(reverse('metric_index'))
-    # Заводим полученный результат в массив pandas 
-    result_frame = pd.read_json(json.dumps(result), orient="records")
-    # Определение тиков для оси ординат (дат)
-    locator = mdates.AutoDateLocator(minticks=5, maxticks=9)
-    formatter = mdates.ConciseDateFormatter(locator)
-    # 1 plot - edge_cache_status_hit_ratio
-    fig, ax = plt.subplots(figsize=(7, 7), layout='constrained')
-    ax.xaxis.set_major_locator(locator)
-    ax.xaxis.set_major_formatter(formatter)
-    ax.plot(result_frame["timestamp"], result_frame["edge_cache_status_hit_ratio"])
-    ax.set_title("Edge cache status hit ratio") 
-    # Сохранение рисунка в памяти
-    img1_in_memory = BytesIO()
-    plt.savefig(img1_in_memory, format="png")
-    edge_cache = base64.b64encode(img1_in_memory.getvalue()).decode()
-    plt.clf()
-    # 2 plot - edge_requests_count и edge_status_4xx
-    fig, ax = plt.subplots(figsize=(7, 7), layout='constrained')
-    ax.xaxis.set_major_locator(locator)
-    ax.xaxis.set_major_formatter(formatter)
-    ax.plot(result_frame["timestamp"], result_frame["edge_requests_count"], label="edge requests count")
-    ax.plot(result_frame["timestamp"], result_frame["edge_status_4xx"], label="edge status 4xx")
-    ax.set_title("Edge requests") 
-    ax.legend()
-    img2_in_memory = BytesIO()
-    plt.savefig(img2_in_memory, format="png")
-    edge_requests = base64.b64encode(img2_in_memory.getvalue()).decode()
-    plt.clf()
-    # 3 plot - origin_requests_count - origin_status_4xx
-    fig, ax = plt.subplots(figsize=(7, 7), layout='constrained')
-    ax.xaxis.set_major_locator(locator)
-    ax.xaxis.set_major_formatter(formatter)
-    ax.plot(result_frame["timestamp"], result_frame["origin_requests_count"], label="origin requests count")
-    ax.plot(result_frame["timestamp"], result_frame["origin_status_4xx"], label="origin status 4xx")
-    ax.set_title("Origin requests") 
-    ax.legend()
-    img3_in_memory = BytesIO()
-    plt.savefig(img3_in_memory, format="png")
-    origin_requests = base64.b64encode(img3_in_memory.getvalue()).decode()
-    plt.clf()
-    # 4 plot - отношение edge к origin
-    result_frame["ratio_requests_count"] = result_frame["edge_requests_count"] / result_frame["origin_requests_count"]
-    result_frame["ratio_status_4xx"] = result_frame["edge_status_4xx"] / result_frame["origin_status_4xx"]
-    fig, ax = plt.subplots(figsize=(7, 7), layout='constrained')
-    ax.xaxis.set_major_locator(locator)
-    ax.xaxis.set_major_formatter(formatter)
-    ax.plot(result_frame["timestamp"], result_frame["ratio_requests_count"], label="ratio requests count")
-    ax.plot(result_frame["timestamp"], result_frame["ratio_status_4xx"], label="ratio status 4xx")
-    ax.set_title("Ratio of edge requests count to origin ones")
-    ax.legend() 
-    img4_in_memory = BytesIO()
-    plt.savefig(img4_in_memory, format="png")
-    ratio_requests = base64.b64encode(img4_in_memory.getvalue()).decode()
-    plt.clf()
+    plot_list = []
+    for metric in metrics_list:
+        # Отправляем запрос на метрику   
+        responce = objStat.get_stat(portal_id, from_date, to_date, metric)
+        # Если ответ положительный готовим данные для вывода на график
+        getPlot = MetricPlot()
+        if responce != False:
+            data_plot = getPlot.StatPlot(metric, portal_id, responce)
+            plot_list.append(data_plot)        
     context = {
-        "plot_edge_cash": edge_cache,
-        "plot_edge_requests": edge_requests,
-        "plot_origin_requests": origin_requests,
-        "plot_ratio_requests": ratio_requests,
-        "origin": 1,
+        "plot_list": plot_list,
+        "portal": portal,
         "from_date": from_date.strftime("%d/%m/%Y"),
         "to_date": to_date.strftime("%d/%m/%Y")
     }

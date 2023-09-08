@@ -6,8 +6,7 @@ def index(request):
         "stat_cdn/": "Получение статистики трафика через API",
         "traffic_metric/": "Получение метрик трафика через API",
         "test_images/": "Проверка загрузки изображений через CDN",
-        "test_cache/": "Проверка кеширования контента в CDN",
-        "log_analyse/": "Анализ лог файла CDN",
+        "log_analyse/": "Анализ логов CDN",
         "dnsheader/": "Сведения о DNS домена и HTTP заголовках",
         "clear_cache/": "Очистка кеша в CDN" 
     }

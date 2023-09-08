@@ -7,16 +7,16 @@
     {% csrf_token %}
     <table class="table">
         <tr>
-            {% if project_list %}
+            {% if portal_list %}
             <th>
                 <label class="form-label">Портал: </label>
             </th>
             <td>
-                <select name="project" class="form-select">
+                <select name="portal" class="form-select">
                     <option value="no_select">---------Выберите портал---------</option>
-                    {% for project in project_list %}
-                        <option value="{{project.project}}">
-                            {{project.description}}
+                    {% for portal in portal_list %}
+                        <option value="{{portal.id}}">
+                            {{portal.description}}
                         </option>
                     {% endfor %}
                 </select>
@@ -59,7 +59,6 @@
             </th>
             <td>
                 <select name="metrics" class="form-select" multiple>
-                    <option value="no_select">---------Выберите метрики---------</option>
                     {% for m in metrics %}
                         <option value="{{m}}">{{m}}</option>
                     {% endfor %}

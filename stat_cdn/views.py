@@ -1,20 +1,12 @@
 from django.shortcuts import render
 from datetime import date
-from datetime import datetime
 from .Stat import Statsite
+from .MetricPlot import MetricPlot
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
 from django.conf import settings
 import requests
-
-from io import BytesIO
-import base64
-
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-import matplotlib.dates as mdates
 
 def index(request):
     # Выбираем список ресурсов
@@ -83,34 +75,9 @@ def results(request):
     # Отправляем запрос на метрику sent_bytes - to get traffic in bytes from CDN servers to the end users   
     responce = objStat.get_stat(portal_id, from_date, to_date, "sent_bytes")
     # Если ответ положительный готовим данные для вывода на график
+    getPlot = MetricPlot()
     if responce != False:
-        # Добираемся до данных формата: 
-        # 1680570000 — the time in the UNIX timestamp at which the statistics were received
-        # 17329220573 — number of bytes
-        data = responce['resource'][portal_id]['metrics']['sent_bytes']
-        plot_y = []
-        plot_x = []
-        for value in data:
-            # переводим в Гигабайты
-            plot_y.append(value[1]/1024/1024/1024)
-            # переводим в питоновские объекты
-            plot_x.append(datetime.fromtimestamp(value[0]))
-        # Определение тиков для оси ординат (дат)
-        locator = mdates.AutoDateLocator(minticks=5, maxticks=9)
-        formatter = mdates.ConciseDateFormatter(locator)
-        fig, ax = plt.subplots(figsize=(7, 7), layout='constrained')
-        ax.xaxis.set_major_locator(locator)
-        ax.xaxis.set_major_formatter(formatter)
-        ax.plot(plot_x, plot_y)
-        ax.set_title("Edge cache status hit ratio") 
-        plt.plot(plot_x, plot_y)
-        plt.ylabel('GB')
-        plt.autoscale()
-        # График сохраняем в памяти и передаем в шаблон
-        img_in_memory = BytesIO()
-        plt.savefig(img_in_memory, format="png")
-        data_plot = base64.b64encode(img_in_memory.getvalue()).decode()
-        plt.clf()
+        data_plot = getPlot.StatPlot('sent_bytes', portal_id, responce)
 # Форматирование вывода периода для шаблона
     period = request.POST['from_day'] + "/" + request.POST['from_month'] + "/" \
             + request.POST['from_year'] + " - " + request.POST['to_day'] + "/" \

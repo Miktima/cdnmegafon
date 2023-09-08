@@ -30,7 +30,7 @@
                 <label class="form-label">Период:</label>
             </th>
             <td>
-                <div class="input-group"><span class="pe-5">с</span> 
+                <div class="input-group"> 
                 <select name="from_year" class="form-select">
                 {% for year in years %}<option value="{{year}}"{%if year == current_year %} selected{% endif %}>{{year}}</option>{% endfor %}
                 </select>
@@ -40,7 +40,7 @@
                 <select name="from_day" class="form-select">
                 {% for day in days %}<option value="{{day}}"{%if day == current_day %} selected{% endif %}>{{day}}</option>{% endfor %}
                 </select>
-                <span class="px-5">по</span> 
+                <span class="mx-3"> - </span> 
                 <select name="to_year" class="form-select">
                 {% for year in years %}<option value="{{year}}"{%if year == current_year %} selected{% endif %}>{{year}}</option>{% endfor %}
                 </select>
