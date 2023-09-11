@@ -1,0 +1,110 @@
+{% extends "cdn/base_index.html" %}
+{% block description_contetnt %}Анализ лог файла CDN{% endblock %}
+{% block title %}Анализ лог файла CDN{% endblock %}
+{% block h1 %}Анализ лог файла CDN{% endblock %}
+{% block form_content %}
+    <form action="{% url 'log_results' %}" method="post">
+        {% csrf_token %}
+        <table class="table">
+            <tr>
+                {% if portal_list %}
+                <th>
+                    <label class="form-label">Портал: </label>
+                </th>
+                <td>
+                    <select name="portal" class="form-select">
+                        <option value="no_select">---------Выберите портал---------</option>
+                        {% for portal in portal_list %}
+                            <option value="{{portal.id}}">
+                                {{portal.description}}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+                {% else %}
+                <td colspan="2"><span>Не заполнен список проектов</span></td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>
+                    <label class="form-label">Начало:</label>
+                </th>
+                <td>
+                    <div class="input-group">
+                        <select name="from_year" class="form-select">
+                            {% for year in years %}<option value="{{year}}"{%if year == current_year %} selected{% endif %}>{{year}}</option>{% endfor %}
+                        </select>
+                        <select name="from_month" class="form-select">
+                            {% for month in months %}<option value="{{month}}"{%if month == current_month %} selected{% endif %}>{{month}}</option>{% endfor %}
+                        </select>
+                        <select name="from_day" class="form-select">
+                            {% for day in days %}<option value="{{day}}"{%if day == current_day %} selected{% endif %}>{{day}}</option>{% endfor %}
+                        </select>
+                        <span class="mx-3">&nbsp;</span>
+                        <select name="from_hour" class="form-select">
+                            {% for hour in hours %}<option value="{{hour}}">{% if hour <= 9 %}0{% endif %}{{hour}}</option>{% endfor %}
+                        </select>
+                        <span class="mx-1">:</span>
+                        <select name="from_min" class="form-select">
+                            {% for min in minutes %}<option value="{{min}}">{% if min <= 9 %}0{% endif %}{{min}}</option>{% endfor %}
+                        </select>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2">Фильтры</th>
+            </tr>
+            {% for filter in logfilter %}
+            <tr>
+                <th>
+                    <label class="form-label">{{filter}}</label>
+                </th>
+                <td>
+                    <div class="input-group">
+                        <select name="{{filter}}_oper" class="form-select">
+                            {% for oper in logoperator %}
+                                <option value="{{oper}}">{{oper}}</option>
+                            {% endfor %}
+                            {% if filter == 'size' or filter == 'status' %}
+                                {% for oper in logoperatorplus %}
+                                    <option value="{{oper}}">{{oper}}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                        {% if filter == 'method' %}
+                        <select name="{{filter}}_value" class="form-select">
+                            <option value="no">---------</option>
+                            {% for value in logmethod %}
+                                <option value="{{value}}">{{value}}</option>
+                            {% endfor %}
+                        </select>
+                        {% elif filter == 'cache_status' %}
+                        <select name="{{filter}}_value" class="form-select">
+                            <option value="no">---------</option>
+                            {% for value in logcachestatus %}
+                                <option value="{{value}}">{{value}}</option>
+                            {% endfor %}
+                        </select>
+                        {% else %}
+                        <input name="{{filter}}_value" type="text" class="form-control">
+                        {% endif %}
+                        <div class="form-check mx-3">
+                            <input class="form-check-input" type="checkbox" value="" id="flexplot{{filter}}" name="plot_{{filter}}">
+                            <label class="form-check-label" for="flexplot{{filter}}">
+                            </label>
+                        </div>                          
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
+{% block back %}
+<div class="text-start pt-5"><a href = "{% url 'main' %}" class="btn btn-info text-white">К списку утилит</a></div>
+{% endblock %}
+{% block description %}
+<p>Вывод агрегированных значений логов CDN-ресурсов. Можно просмотреть основные данные за последние 3 дня. Интервал данных в одном запросе 6 часов.
+    Чекбокс у фильтра позволяет вывести соответствующий аггрегированный график</p>
+{% endblock %}

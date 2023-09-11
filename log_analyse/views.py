@@ -1,10 +1,13 @@
 from django.shortcuts import render
-from .forms import LogForm
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 import pandas as pd
 from io import BytesIO
 import base64
 from django.contrib import messages
-from zipfile import ZipFile
+from datetime import date
+from django.conf import settings
+import requests
 
 import matplotlib
 matplotlib.use('Agg')
@@ -13,108 +16,83 @@ from matplotlib.ticker import MaxNLocator
 
 
 def index(request):
-    form = LogForm()
-    return render(request, "log_analize/index.html", {'form': form})
+    # Заполняем список проектов (порталов), для работы с API используется имя портала
+    headers = {'Authorization': 'APIKey ' + settings.APIKEY}
+    # Выборка ресурсов
+    resources = requests.get(settings.APIURLS['urlResources'], headers=headers)
+    status_code = resources.status_code
+    if status_code != 200:
+        messages.error(request, "Ошибка выборки порталов: " + status_code)
+    res = resources.json()
+    portal_list = []
+    for r in res:
+        resDict = {}
+        resDict["id"] = r["id"]
+        resDict["description"] = r["description"]
+        portal_list.append(resDict)
+    # Заполняем списки для дат
+    years = [2021, 2022, 2023]
+    months = []
+    for i in range (1, 13):
+        months.append(i)
+    days = []
+    for i in range (1, 32):
+        days.append(i)
+    hours = []
+    for i in range (0, 24):
+        hours.append(i)
+    minutes = []
+    for i in range (0, 60):
+        minutes.append(i)
+    td = date.today()
+    current_year = int(td.strftime("%Y"))
+    current_month = int(td.strftime("%m"))
+    current_day = int(td.strftime("%d"))
+    context = {
+        'portal_list': portal_list,
+        'years': years,
+        'months': months,
+        'days': days,
+        'hours': hours,
+        'minutes': minutes,
+        'current_year': current_year,
+        'current_month': current_month,
+        'current_day': current_day,
+        'logfilter': settings.LOGFILTER,
+        'logoperator': settings.LOGOPERATOR,
+        'logoperatorplus': settings.LOGOPERATORPLUS,
+        'logmethod': settings.LOGMETHOD,
+        'logcachestatus': settings.LOGCACHESTATUS
+    }
+    return render(request, "log_analyse/index.html", context)
 
 def results(request):
-    if request.method == 'POST':
-        form = LogForm(request.POST, request.FILES)
-        if form.is_valid():
-            filename = (request.FILES['file']).name
-            ext_file = filename[(filename.rfind(".")+1):len(filename)]
-            if ext_file == "csv":
-                log_table = pd.read_csv(request.FILES['file'], sep=";")
-            elif ext_file == "zip":
-                archive = ZipFile(request.FILES['file'], 'r')
-                filename_csv = (request.FILES['file'].name).replace(".zip", ".csv")
-                log_table = pd.read_csv(archive.extract(filename_csv), sep=";")
-            x=[]
-            xticks = []
-            for i in range(1,21):
-                x.append(i)
-                if (i%4) == 0:
-                    xticks.append(i)
-            # request_uri chart
-            request_uri_ser = (log_table["request_uri"].value_counts()).head(20)
-            request_uri_links = request_uri_ser.to_dict()
-            request_uri_values = request_uri_ser.tolist()
-            fig, ax = plt.subplots(figsize=(7, 7))
-            ax.bar(x, request_uri_values, width=1, edgecolor="white", linewidth=0.7, align='edge')
-            ax.set(xlim=(1, 20), xticks=xticks)
-            ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-            # fig, ax = plt.subplots(figsize=(7, 7), layout='constrained')
-            # ax.plot(request_uri_values)
-            # ax.set_xlabel('Номер позиции')
-            ax.set_title("request_uri") 
-            request_uri_img = BytesIO()
-            plt.savefig(request_uri_img, format="png")
-            request_uri_pic = base64.b64encode(request_uri_img.getvalue()).decode()
-            plt.clf()
-            # http_user_agent chart
-            http_user_agent_ser = (log_table["http_user_agent"].value_counts()).head(20)
-            http_user_agent_links = http_user_agent_ser.to_dict()
-            http_user_agent_values = http_user_agent_ser.tolist()
-            fig, ax = plt.subplots(figsize=(7, 7), layout='constrained')
-            ax.bar(x, http_user_agent_values, width=1, edgecolor="white", linewidth=0.7, align='edge')
-            ax.set(xlim=(1, 20), xticks=xticks)
-            ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-            ax.set_title("http_user_agent") 
-            http_user_agent_img = BytesIO()
-            plt.savefig(http_user_agent_img, format="png")
-            http_user_agent_pic = base64.b64encode(http_user_agent_img.getvalue()).decode()
-            plt.clf()
-            # http_referer chart
-            http_referer_ser = (log_table["http_referer"].value_counts()).head(20)
-            http_referer_links = http_referer_ser.to_dict()
-            http_referer_values = http_referer_ser.tolist()
-            fig, ax = plt.subplots(figsize=(7, 7))
-            ax.bar(x, http_referer_values, width=1, edgecolor="white", linewidth=0.7, align='edge')
-            ax.set(xlim=(1, 20), xticks=xticks)
-            ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-            ax.set_title("http_referer") 
-            http_referer_img = BytesIO()
-            plt.savefig(http_referer_img, format="png")
-            http_referer_pic = base64.b64encode(http_referer_img.getvalue()).decode()
-            plt.clf()
-            # request_uri with 404 error 
-            error404 = log_table.loc[log_table["status"] == 404, "request_uri"]
-            error404_ser = (error404.value_counts()).head(20)
-            error404_links = error404_ser.to_dict()
-            error404_values = error404_ser.tolist()
-            # Если размер списка меньше 20, дополняем нулями
-            if error404_ser.size < 20:
-                for i in range(error404_ser.size, 20):
-                    error404_values.append(0)                   
-            fig, ax = plt.subplots(figsize=(7, 7))
-            ax.bar(x, error404_values, width=1, edgecolor="white", linewidth=0.7, align='edge')
-            ax.set(xlim=(1, 20), xticks=xticks)
-            ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-            ax.set_title("request_uri - error 404") 
-            error404_img = BytesIO()
-            plt.savefig(error404_img, format="png")
-            error404_pic = base64.b64encode(error404_img.getvalue()).decode()
-            plt.clf()
-            context = {
-                "request_uri_plot": request_uri_pic,
-                "request_uri_links": request_uri_links,
-                "request_uri_values": request_uri_values,
-                "http_user_agent_plot": http_user_agent_pic,
-                "http_user_agent_links": http_user_agent_links,
-                "http_user_agent_values": http_user_agent_values,
-                "http_referer_plot": http_referer_pic,
-                "http_referer_links": http_referer_links,
-                "http_referer_values": http_referer_values,
-                "error404_plot": error404_pic,
-                "error404_links": error404_links,
-                "error404_values": error404_values,
-                "filename": filename,
-            }
-            return render(request, "log_analize/results.html", context)
-        else:
-            form = LogForm()
-            messages.error(request, form.errors)
-            return render(request, "log_analize/index.html", {'form': form})            
-    else:
-        form = LogForm()
-        return render(request, "log_analize/index.html", {'form': form})
+    portal_id = request.POST['portal']
+    if portal_id == 'no_select':
+        messages.error(request, 'Требуется выбрать портал')
+        return HttpResponseRedirect(reverse('metric_index'))       
+    metrics_list = request.POST.getlist('metrics')
+    if len(metrics_list) == 0:
+        messages.error(request, 'Хотя бы одна метрика должна быть выбрана')
+        return HttpResponseRedirect(reverse('metric_index'))            
+    # Формируем начальную и конечную дату получения метрик
+    # Для начальной даты время идет с 0 часов, для конечной даты время устанавливается 23-59
+    from_date = date(int(request.POST['from_year']), int(request.POST['from_month']), int(request.POST['from_day']))
+    to_date = date(int(request.POST['to_year']), int(request.POST['to_month']), int(request.POST['to_day']))
+    # Проверка, что начальная дата должна быть меньше конечной
+    if from_date > to_date:
+        messages.error(request, 'Дата начала периода должна быть меньше даты окончания')
+        return HttpResponseRedirect(reverse('metric_index'))        
+    # Вытаскиваем CDN портала
+    headers = {'Authorization': 'APIKey ' + settings.APIKEY}
+    # Выборка ресурсов
+    resources = requests.get(settings.APIURLS['urlResources'] + "/" + portal_id, headers=headers)
+    status_code = resources.status_code
+    if status_code != 200:
+        messages.error(request, "Ошибка выборки портала: " + str(status_code))
+    res = resources.json()
+    portal = res["cname"]
+    if len(res["secondaryHostnames"]) > 0:
+        for secCname in res["secondaryHostnames"]:
+            portal += "; " + secCname
 

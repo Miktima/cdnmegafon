@@ -1,0 +1,43 @@
+{
+    "filter": [
+        "method",
+        "client_ip",
+        "status",
+        "size",
+        "cache_status",
+        "datacenter"
+    ],
+    "operator": [
+        "eq",
+        "ne",
+        "in",
+        "not_in"
+    ],
+    "operatorplus": [
+        "gt",
+        "gte",
+        "lt",
+        "lte"
+    ],
+    "method": [
+        "CONNECT",
+        "DELETE",
+        "GET",
+        "HEAD",
+        "OPTIONS",
+        "PATCH",
+        "POST",
+        "PUT",
+        "TRACE"
+    ],
+    "cache_status": [
+        "MISS",
+        "BYPASS",
+        "EXPIRED",
+        "STALE",
+        "PENDING",
+        "UPDATING",
+        "REVALIDATED",
+        "HIT"
+    ]
+}

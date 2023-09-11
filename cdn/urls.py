@@ -24,7 +24,6 @@ urlpatterns = [
     path('stat_cdn/', include('stat_cdn.urls')),
     path('traffic_metric/', include('traffic_metric.urls')),
     path('test_images/', include('test_images.urls')),
-    path('test_cache/', include('test_cache.urls')),
     path('log_analyse/', include('log_analyse.urls')),
     path('dnsheader/', include('dnsheader.urls')),
     path('clear_cache/', include('clear_cache.urls')),

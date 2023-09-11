@@ -10,7 +10,7 @@ from django.conf import settings
 
 
 def index(request):
-    # Заполняем список проектов (порталов), для работы с API использется имя портала
+    # Заполняем список проектов (порталов), для работы с API используется имя портала
     headers = {'Authorization': 'APIKey ' + settings.APIKEY}
     # Выборка ресурсов
     resources = requests.get(settings.APIURLS['urlResources'], headers=headers)
