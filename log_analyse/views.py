@@ -5,7 +5,8 @@ import pandas as pd
 from io import BytesIO
 import base64
 from django.contrib import messages
-from datetime import date
+from datetime import datetime
+from datetime import timedelta
 from django.conf import settings
 import requests
 
@@ -44,7 +45,7 @@ def index(request):
     minutes = []
     for i in range (0, 60):
         minutes.append(i)
-    td = date.today()
+    td = datetime.today()
     current_year = int(td.strftime("%Y"))
     current_month = int(td.strftime("%m"))
     current_day = int(td.strftime("%d"))
@@ -71,6 +72,12 @@ def results(request):
     if portal_id == 'no_select':
         messages.error(request, 'Требуется выбрать портал')
         return HttpResponseRedirect(reverse('metric_index'))       
+    # Формируем начальную и конечную дату получения метрик
+    from_date = datetime(int(request.POST['from_year']), int(request.POST['from_month']), \
+                        int(request.POST['from_day']), int(request.POST['from_hour']), \
+                        int(request.POST['from_min']) )
+    # Для получения конечной даты прибавляем 6 часов
+    to_date = from_date + timedelta(hours = 6)
     metrics_list = request.POST.getlist('metrics')
     if len(metrics_list) == 0:
         messages.error(request, 'Хотя бы одна метрика должна быть выбрана')

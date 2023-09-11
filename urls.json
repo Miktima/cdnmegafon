@@ -3,5 +3,6 @@
     "urlServiceFeatures": "https://api.lk.cdn.megafon.ru/cdn/clients/me/features",
     "urlSourceGroups": "https://api.lk.cdn.megafon.ru/cdn/source_groups",
     "urlResources": "https://api.lk.cdn.megafon.ru/cdn/resources",
-    "urlResStat": "https://api.lk.cdn.megafon.ru/cdn/statistics/series"
+    "urlResStat": "https://api.lk.cdn.megafon.ru/cdn/statistics/series",
+    "urlLog": "https://api.lk.cdn.megafon.ru/cdn/advanced/v1/logs"
 }
