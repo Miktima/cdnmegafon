@@ -8,8 +8,12 @@ from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
 
 
-class MetricPlot:
+class LogConstruct:
     def __init__(self):
+    # Определяем параметры запроса
+        self.limit = "?limit=1000"
+        self.fromdate = "&from="
+        self.todate = "&to="
     # Определяем константы
         self.gbyte = 1024 * 1024 * 1024
         self.mil = 1000000

@@ -68,38 +68,44 @@ def index(request):
     return render(request, "log_analyse/index.html", context)
 
 def results(request):
-    portal_id = request.POST['portal']
-    if portal_id == 'no_select':
-        messages.error(request, 'Требуется выбрать портал')
-        return HttpResponseRedirect(reverse('metric_index'))       
-    # Формируем начальную и конечную дату получения метрик
-    from_date = datetime(int(request.POST['from_year']), int(request.POST['from_month']), \
-                        int(request.POST['from_day']), int(request.POST['from_hour']), \
-                        int(request.POST['from_min']) )
-    # Для получения конечной даты прибавляем 6 часов
-    to_date = from_date + timedelta(hours = 6)
-    metrics_list = request.POST.getlist('metrics')
-    if len(metrics_list) == 0:
-        messages.error(request, 'Хотя бы одна метрика должна быть выбрана')
-        return HttpResponseRedirect(reverse('metric_index'))            
-    # Формируем начальную и конечную дату получения метрик
-    # Для начальной даты время идет с 0 часов, для конечной даты время устанавливается 23-59
-    from_date = date(int(request.POST['from_year']), int(request.POST['from_month']), int(request.POST['from_day']))
-    to_date = date(int(request.POST['to_year']), int(request.POST['to_month']), int(request.POST['to_day']))
-    # Проверка, что начальная дата должна быть меньше конечной
-    if from_date > to_date:
-        messages.error(request, 'Дата начала периода должна быть меньше даты окончания')
-        return HttpResponseRedirect(reverse('metric_index'))        
-    # Вытаскиваем CDN портала
-    headers = {'Authorization': 'APIKey ' + settings.APIKEY}
-    # Выборка ресурсов
-    resources = requests.get(settings.APIURLS['urlResources'] + "/" + portal_id, headers=headers)
-    status_code = resources.status_code
-    if status_code != 200:
-        messages.error(request, "Ошибка выборки портала: " + str(status_code))
-    res = resources.json()
-    portal = res["cname"]
-    if len(res["secondaryHostnames"]) > 0:
-        for secCname in res["secondaryHostnames"]:
-            portal += "; " + secCname
+    if request.method == "POST":
+        portal_id = request.POST['portal']
+        if portal_id == 'no_select':
+            messages.error(request, 'Требуется выбрать портал')
+            return HttpResponseRedirect(reverse('metric_index'))       
+        # Формируем начальную и конечную дату получения метрик
+        from_date = datetime(int(request.POST['from_year']), int(request.POST['from_month']), \
+                            int(request.POST['from_day']), int(request.POST['from_hour']), \
+                            int(request.POST['from_min']) )
+        # Для получения конечной даты прибавляем 6 часов
+        to_date = from_date + timedelta(hours = 6)
+        filter_list = []
+        for filter in settings.LOGFILTER:
+            if !(request.POST[filter + '_value'] == 'no' or request.POST[filter + '_value'] == ''):
+        # metrics_list = request.POST.getlist('metrics')
+        # if len(metrics_list) == 0:
+        #     messages.error(request, 'Хотя бы одна метрика должна быть выбрана')
+        #     return HttpResponseRedirect(reverse('metric_index'))            
+        # # Формируем начальную и конечную дату получения метрик
+        # # Для начальной даты время идет с 0 часов, для конечной даты время устанавливается 23-59
+        # from_date = date(int(request.POST['from_year']), int(request.POST['from_month']), int(request.POST['from_day']))
+        # to_date = date(int(request.POST['to_year']), int(request.POST['to_month']), int(request.POST['to_day']))
+        # # Проверка, что начальная дата должна быть меньше конечной
+        # if from_date > to_date:
+        #     messages.error(request, 'Дата начала периода должна быть меньше даты окончания')
+        #     return HttpResponseRedirect(reverse('metric_index'))        
+        # # Вытаскиваем CDN портала
+        # headers = {'Authorization': 'APIKey ' + settings.APIKEY}
+        # # Выборка ресурсов
+        # resources = requests.get(settings.APIURLS['urlResources'] + "/" + portal_id, headers=headers)
+        # status_code = resources.status_code
+        # if status_code != 200:
+        #     messages.error(request, "Ошибка выборки портала: " + str(status_code))
+        # res = resources.json()
+        # portal = res["cname"]
+        # if len(res["secondaryHostnames"]) > 0:
+        #     for secCname in res["secondaryHostnames"]:
+        #         portal += "; " + secCname
+        context = {}
+        return render(request, "log_analyse/results.html", context)
 
