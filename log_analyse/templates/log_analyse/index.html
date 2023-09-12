@@ -1,7 +1,7 @@
 {% extends "cdn/base_index.html" %}
-{% block description_contetnt %}Анализ лог файла CDN{% endblock %}
-{% block title %}Анализ лог файла CDN{% endblock %}
-{% block h1 %}Анализ лог файла CDN{% endblock %}
+{% block description_contetnt %}Анализ логов CDN{% endblock %}
+{% block title %}Анализ логов CDN{% endblock %}
+{% block h1 %}Анализ логов CDN{% endblock %}
 {% block form_content %}
     <form action="{% url 'log_results' %}" method="post">
         {% csrf_token %}
@@ -94,6 +94,17 @@
                             </label>
                         </div>                          
                     </div>
+                    {% if filter == 'size' or filter == 'status' %}
+                    <div class="input-group">
+                        <select name="{{filter}}_oper2" class="form-select">
+                            {% for oper in logoperatorplus %}
+                                <option value="{{oper}}">{{oper}}</option>
+                            {% endfor %}
+                        </select>
+                        <input name="{{filter}}_value2" type="text" class="form-control">
+                        <div class="mx-4">&nbsp;</div>
+                    </div>                                
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -106,5 +117,6 @@
 {% endblock %}
 {% block description %}
 <p>Вывод агрегированных значений логов CDN-ресурсов. Можно просмотреть основные данные за последние 3 дня. Интервал данных в одном запросе 6 часов.
-    Чекбокс у фильтра позволяет вывести соответствующий аггрегированный график</p>
+    Чекбокс у фильтра позволяет вывести соответствующий аггрегированный график. У фильтров <em>status</em> и <em>size</em> расширенное число операторов и 
+можно устанавливать значения, ограниченные диапазоном</p>
 {% endblock %}
