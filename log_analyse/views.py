@@ -9,6 +9,7 @@ from datetime import datetime
 from datetime import timedelta
 from django.conf import settings
 import requests
+from .LogConstruct import LogConstruct
 
 import matplotlib
 matplotlib.use('Agg')
@@ -81,7 +82,20 @@ def results(request):
         to_date = from_date + timedelta(hours = 6)
         filter_list = []
         for filter in settings.LOGFILTER:
-            if !(request.POST[filter + '_value'] == 'no' or request.POST[filter + '_value'] == ''):
+            tmpFilter = {}
+            if (request.POST[filter + '_value'] == 'no' or request.POST[filter + '_value'] == '') == False:
+                tmpFilter["filter"] = filter
+                tmpFilter["value"] = request.POST[filter + '_value']
+                tmpFilter["operator"] = request.POST[filter + '_oper']
+                if filter == 'size' or filter == 'status':
+                    tmpFilter["value2"] = request.POST[filter + '_value2']
+                    tmpFilter["operator2"] = request.POST[filter + '_oper2']
+                else:
+                    tmpFilter["value2"] = ""
+                    tmpFilter["operator2"] = ""
+                filter_list.append(tmpFilter)
+        logConst = LogConstruct()
+        value = logConst.consructRequest(filter_list, from_date, to_date)
         # metrics_list = request.POST.getlist('metrics')
         # if len(metrics_list) == 0:
         #     messages.error(request, 'Хотя бы одна метрика должна быть выбрана')
@@ -106,6 +120,8 @@ def results(request):
         # if len(res["secondaryHostnames"]) > 0:
         #     for secCname in res["secondaryHostnames"]:
         #         portal += "; " + secCname
-        context = {}
+        context = {
+            "value": value
+        }
         return render(request, "log_analyse/results.html", context)
 

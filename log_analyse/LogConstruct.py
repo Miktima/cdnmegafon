@@ -18,7 +18,13 @@ class LogConstruct:
         self.gbyte = 1024 * 1024 * 1024
         self.mil = 1000000
 
-
+    def consructRequest(self, filters, fromdate:datetime, todate:datetime):
+        req = self.limit + self.fromdate + fromdate.isoformat() + self.todate + todate.isoformat()
+        for f in filters:
+            req += "&" + f["filter"] + "__" + f["oper"] + "=" + f["value"]
+            if f["value2"] != "":
+                req += "&" + f["filter"] + "__" + f["oper"] + "=" + f["value"]
+    
     def StatPlot(self, metric, portal_id, responce):
         # Проверяем, что метрика должна возвращать байты и определяем заголовок графика
         match metric:
