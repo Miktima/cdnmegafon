@@ -1,12 +1,12 @@
 from datetime import datetime
 from io import BytesIO
 import base64
+import pandas as pd
 
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
-import matplotlib.dates as mdates
-
+from matplotlib.ticker import MaxNLocator
 
 class LogConstruct:
     def __init__(self):
@@ -14,117 +14,54 @@ class LogConstruct:
         self.limit = "?limit=1000"
         self.fromdate = "&from="
         self.todate = "&to="
-    # Определяем константы
-        self.gbyte = 1024 * 1024 * 1024
-        self.mil = 1000000
+        self.resource = "&resource_id__eq="
+    # Заголовки графиков
+        self.plot_titiles = {
+            'path': 'The requested path',
+            'user_agent': 'The User-Agent HTTP header value',
+            'method': 'HTTP method used in the request',
+            'client_ip': 'The IP from which the request was made',
+            'status': 'HTTP status code',
+            'size': 'Response size in bytes',
+            'cache_status': 'The cache status',
+            'datacenter': 'The data center where the request was processed'
+        }
 
-    def consructRequest(self, filters, fromdate:datetime, todate:datetime):
-        req = self.limit + self.fromdate + fromdate.isoformat() + self.todate + todate.isoformat()
+    def consructRequest(self, resource_id, filters, fromdate:datetime, todate:datetime):
+        # формат для даты - (ISO 8086/RFC 3339 format; UTC)
+        req = self.limit + self.resource + resource_id + self.fromdate + fromdate.isoformat() + "Z" \
+                + self.todate + todate.isoformat() + "Z"
         for f in filters:
-            req += "&" + f["filter"] + "__" + f["oper"] + "=" + f["value"]
+            req += "&" + f["filter"] + "__" + f["operator"] + "=" + f["value"]
             if f["value2"] != "":
-                req += "&" + f["filter"] + "__" + f["oper"] + "=" + f["value"]
+                req += "&" + f["filter"] + "__" + f["operator2"] + "=" + f["value2"]
+        return req
     
-    def StatPlot(self, metric, portal_id, responce):
+    def logPlot(self, data, aggregate:list):
         # Проверяем, что метрика должна возвращать байты и определяем заголовок графика
-        match metric:
-            case 'upstream_bytes':
-                title = 'Traffic from the source to the CDN \
-                            servers or from the source to the shielding'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'sent_bytes':
-                title = 'Traffic from CDN servers to the end users'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'shield_bytes':
-                title = 'Traffic from shielding to CDN servers'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'total_bytes':
-                title = 'The sum of shield_bytes, upstream_bytes and sent_bytes traffic'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'cdn_bytes':
-                title = 'The sum of sent_bytes and shield_bytes traffic'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'requests':
-                title = 'The number of requests to the CDN servers'
-                factor = self.mil
-                ylable = 'Million'
-            case 'requests_waf_passed':
-                title = 'The number of requests that were processed by the Basic WAF option'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_2xx':
-                title = 'The number of 2xx HTTP response status codes'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_3xx':
-                title = 'The number of 3xx HTTP response status codes'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_4xx':
-                title = 'The number of 4xx HTTP response status codes'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_5xx':
-                title = 'The number of 5xx HTTP response status codes'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_hit':
-                title = 'The number of responses with the HTTP header Cache: HIT'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_miss':
-                title = 'The number of responses with the HTTP header Cache: MISS'
-                factor = self.mil
-                ylable = 'Million'
-            case 'image_processed':
-                title = 'The number of images processed by the Image optimization option'
-                factor = self.mil
-                ylable = 'Million'
-            case 'cache_hit_traffic_ratio':
-                title = 'The amount of cached traffic'
-                factor = 1
-                ylable = 'Ratio'
-            case 'cache_hit_requests_ratio':
-                title = 'The amount of cached content that is sent'
-                factor = 1
-                ylable = 'Ratio'
-            case 'shield_traffic_ratio':
-                title = 'The efficiency of shielding'
-                factor = 1
-                ylable = 'Ratio'
-            case _:
-                print ("ERROR: unsupported metric for BytesPlot")
-                return False
-        # Добираемся до данных формата: 
-        # 1680570000 — the time in the UNIX timestamp at which the statistics were received
-        # 17329220573 — number of bytes
-        data = responce['resource'][portal_id]['metrics'][metric]
-        plot_y = []
-        plot_x = []
-        for value in data:
-            # переводим в миллионы
-            plot_y.append(value[1]/factor)
-            # переводим в питоновские объекты
-            plot_x.append(datetime.fromtimestamp(value[0]))
-        # Определение тиков для оси ординат (дат)
-        locator = mdates.AutoDateLocator(minticks=5, maxticks=9)
-        formatter = mdates.ConciseDateFormatter(locator)
-        fig, ax = plt.subplots(figsize=(7, 7), layout='constrained')
-        ax.xaxis.set_major_locator(locator)
-        ax.xaxis.set_major_formatter(formatter)
-        ax.plot(plot_x, plot_y)
-        ax.set_title(title) 
-        plt.plot(plot_x, plot_y)
-        plt.ylabel(ylable)
-        plt.autoscale()
-        # График сохраняем в памяти и передаем в шаблон
-        img_in_memory = BytesIO()
-        plt.savefig(img_in_memory, format="png")
-        data_plot = base64.b64encode(img_in_memory.getvalue()).decode()
-        plt.clf()
-        return data_plot        
+        log_table = pd.DataFrame.from_records(data)
+        x=[]
+        xticks = []
+        for i in range(1,21):
+            x.append(i)
+            if (i%4) == 0:
+                xticks.append(i)
+        data = []
+        for agg in aggregate:
+            tmpDict = {}
+            # request_uri chart
+            ser = (log_table[agg].value_counts()).head(20)
+            tmpDict["values"] = ser.to_dict()
+            # x_values = ser.tolist()
+            fig, ax = plt.subplots(figsize=(7, 7))
+            ax.bar(x, ser, width=1, edgecolor="white", linewidth=0.7, align='edge')
+            ax.set(xlim=(1, 20), xticks=xticks)
+            ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+            ax.set_title(self.plot_titiles[agg]) 
+            tmpDict["title"] = self.plot_titiles[agg]
+            img = BytesIO()
+            plt.savefig(img, format="png")
+            tmpDict["plot"] = base64.b64encode(img.getvalue()).decode()
+            plt.clf()
+            data.append(tmpDict)
+        return data        

@@ -15,7 +15,7 @@ class MetricPlot:
         self.mil = 1000000
 
 
-    def StatPlot(self, metric, portal_id, responce):
+    def StatPlot(self, metric, portal_id, response):
         # Проверяем, что метрика должна возвращать байты и определяем заголовок графика
         match metric:
             case 'upstream_bytes':
@@ -88,12 +88,12 @@ class MetricPlot:
                 factor = 1
                 ylable = 'Ratio'
             case _:
-                print ("ERROR: unsupported metric for BytesPlot")
+                print ("ERROR: unsupported metric for StatPlot")
                 return False
         # Добираемся до данных формата: 
         # 1680570000 — the time in the UNIX timestamp at which the statistics were received
         # 17329220573 — number of bytes
-        data = responce['resource'][portal_id]['metrics'][metric]
+        data = response['resource'][portal_id]['metrics'][metric]
         plot_y = []
         plot_x = []
         for value in data:
