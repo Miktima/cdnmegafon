@@ -72,7 +72,7 @@ def results(request):
         portal_id = request.POST['portal']
         if portal_id == 'no_select':
             messages.error(request, 'Требуется выбрать портал')
-            return HttpResponseRedirect(reverse('metric_index'))       
+            return HttpResponseRedirect(reverse('log_index'))       
         # Формируем начальную и конечную дату получения метрик
         from_date = datetime(int(request.POST['from_year']), int(request.POST['from_month']), \
                             int(request.POST['from_day']), int(request.POST['from_hour']), \
@@ -102,6 +102,7 @@ def results(request):
         status_code = resources.status_code
         if status_code != 200:
             messages.error(request, "Ошибка выборки портала: " + str(status_code))
+            return HttpResponseRedirect(reverse('log_index'))    
         res = resources.json()
         portal = res["cname"]
         if len(res["secondaryHostnames"]) > 0:
@@ -116,6 +117,7 @@ def results(request):
         reslog = requests.get(settings.APIURLS['urlLog'] + req, headers=headers)
         if reslog.status_code != 200:
             messages.error(request, "Ошибка выборки логов: " + str(reslog.status_code))
+            return HttpResponseRedirect(reverse('log_index'))
         result = reslog.json()
         if len(filter_plot) == 0:
             data_list = logConst.logPlot(result["data"], ['path', 'user_agent'])

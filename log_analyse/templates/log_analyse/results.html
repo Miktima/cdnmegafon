@@ -9,7 +9,7 @@
 {% block content %}
 {{value}}
     {% for d in data %}
-    <h3>d.title</h3>
+    <h3 class="mt-5">{{d.title}}</h3>
     <table class="table table-striped text-start">
         {% for x, y in d.values.items %}
             <tr><td>{{forloop.counter}}</td><td>{{x}}</td><td>{{y}}</td></tr>
