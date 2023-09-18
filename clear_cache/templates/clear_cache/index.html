@@ -5,7 +5,31 @@
 {% block form_content %}
     <form action="{% url 'clearcache_results' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <table class="table">{{form}}</table>
+        <table class="table">
+            <tr>
+                {% if portal_list %}
+                <th>
+                    <label class="form-label">Портал: </label>
+                </th>
+                <td>
+                    <select name="portal" class="form-select">
+                        <option value="no_select">---------Выберите портал---------</option>
+                        {% for portal in portal_list %}
+                            <option value="{{portal.id}}">
+                                {{portal.description}}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+                {% else %}
+                <td colspan="2"><span>Не заполнен список проектов</span></td>
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Маска: </th>
+                <td><input name="masks" type="text" class="form-control"></td>
+            </tr>
+        </table>
         <input type="submit" value="Submit">
     </form>
 {% endblock %}

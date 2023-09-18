@@ -6,59 +6,16 @@
 {% if portal %}
     <h2>Project: {{portal}}</h2>
 {% endif %}
-{% if portalObj %}
-    <h2>Очистка кеша во всех проектах</h2>
-    {% if masks_field %} 
+{% if masks_field %} 
     <h5>Маска: {{masks_field}}</h5>
-    {% else %}
-    <h5>Очистка всего кеша</h5>
-    {% endif%}
-{% endif %}
+{% endif%}
 {% endblock %}
 {% block content %}
 {% if response %}
     <p>{{response}}</p>
 {% endif %}
-{% if portalObj %}
-<table class="table">
-    <thead>
-        <tr>
-          <th scope="col">Sputnik portal</th>
-          <th scope="col">Status</th>
-        </tr>
-    </thead>                
-    {% for portal in portalObj %}
-    <tbody>
-        <tr>
-          <td>{{portal.portal}}</td>
-          <td><img src="../../static/cdn/img/question.svg" height="16" width="16" id="img_status_{{portal.pk}}"></td>
-        </tr>
-    </tbody>
-    {% endfor %}
-</table>
-<input type="hidden" name="portal_indexes" id="p_indexes" value="{{indexes}}">
-<input type="hidden" name="masks_field" id="masks" value="{{masks_field}}">
-<script type="text/javascript">
-    $(document).ready(function() {
-        document.cookie = 'masks=' + $("#masks").val();
-        var portals = ($("#p_indexes").val()).split(",");
-        $.each(portals, function (index) {$.ajax({
-                type:'GET',
-                url:'all_clear/' + portals[index],
-                success:function(response){
-                    if (response.status == 'true' ) {
-                        $("#img_status_" + portals[index]).prop('src', '../../static/cdn/img/check.svg');
-                    }
-                    else if (response.status == "false") {
-                        $("#img_status_" + portals[index]).prop('src', '../../static/cdn/img/dash-circle.svg');
-                    }
-                },
-                error: function(xhr, errmsg, err) {
-                    alert("Status " + "(" + portals[index] + "): " + xhr.status + "  ERROR:" + xhr.error + " " + errmsg + " " + err); 
-                },
-            });});
-        })
-</script>
+{% if result %}
+    {{result }}
 {% endif %}
 {% endblock %}
 {% block back_url %}{% url 'clearcache_index' %}{% endblock %}

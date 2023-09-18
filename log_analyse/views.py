@@ -9,12 +9,6 @@ from django.conf import settings
 import requests
 from .LogConstruct import LogConstruct
 
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-from matplotlib.ticker import MaxNLocator
-
-
 def index(request):
     # Заполняем список проектов (порталов), для работы с API используется имя портала
     headers = {'Authorization': 'APIKey ' + settings.APIKEY}
