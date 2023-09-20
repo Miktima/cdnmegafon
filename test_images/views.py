@@ -3,13 +3,14 @@ from .forms import CdnForm
 from django.contrib import messages
 import requests
 import re
-import time
+import urllib3
 
 def index(request):
     form = CdnForm()
     return render(request, "test_images/index.html", {'form': form})
 
 def results(request):
+    urllib3.disable_warnings()
     if request.method == 'POST':
         form = CdnForm(request.POST)
         if form.is_valid():
@@ -53,12 +54,9 @@ def results(request):
             for l in newcdn_links_list:
                 # загружаем ссылку
                 response_image = requests.get(l, verify=False)
-                # Получаем статус
-                status = response_image.status_code
-                time.sleep(0.3)
                 # Если статус не 200, то считаем ошибкой
-                if status != 200:
-                    bad_list.append([l, status])
+                if response_image.status_code != 200:
+                    bad_list.append([l, response_image.status_code])
             conclusion = "Errors {0:d} from {1:d} urls ({2:.1f}%)".format(len(bad_list), len(newcdn_links_list),\
                 (len(bad_list)/len(newcdn_links_list))*100)
             context = {
