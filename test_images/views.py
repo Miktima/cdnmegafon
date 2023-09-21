@@ -50,10 +50,13 @@ def results(request):
                 if re.search("[a-z]$", l) != None:
                     newcdn_links_list.append("https://" + new_cdn + "/" + l)
             # Начальные данные для подсчета статистики
+            # Запрос через сессии для ускорения (фактор ~6)
+            session = requests.Session()
             bad_list = []
             for l in newcdn_links_list:
                 # загружаем ссылку
-                response_image = requests.get(l, verify=False)
+                # response_image = requests.get(l, verify=False)
+                response_image = session.get(l, verify=False)
                 # Если статус не 200, то считаем ошибкой
                 if response_image.status_code != 200:
                     bad_list.append([l, response_image.status_code])
