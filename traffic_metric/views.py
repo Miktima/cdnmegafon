@@ -82,11 +82,11 @@ def results(request):
     plot_list = []
     for metric in metrics_list:
         # Отправляем запрос на метрику   
-        responce = objStat.get_stat(portal_id, from_date, to_date, metric)
+        response = objStat.get_stat(portal_id, from_date, to_date, metric)
         # Если ответ положительный готовим данные для вывода на график
         getPlot = MetricPlot()
-        if responce != False:
-            data_plot = getPlot.StatPlot(metric, portal_id, responce)
+        if response != False:
+            data_plot = getPlot.StatPlot(metric, portal_id, response)
             plot_list.append(data_plot)        
     context = {
         "plot_list": plot_list,

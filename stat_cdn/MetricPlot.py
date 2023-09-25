@@ -19,8 +19,7 @@ class MetricPlot:
         # Проверяем, что метрика должна возвращать байты и определяем заголовок графика
         match metric:
             case 'upstream_bytes':
-                title = 'Traffic from the source to the CDN \
-                            servers or from the source to the shielding'
+                title = 'Traffic from the source to the CDN servers'
                 factor = self.gbyte
                 ylable = 'GB'
             case 'sent_bytes':
