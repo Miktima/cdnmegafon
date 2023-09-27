@@ -1,6 +1,5 @@
 {
     "filter": [
-        "method",
         "client_ip",
         "status",
         "size",
@@ -18,17 +17,6 @@
         "gte",
         "lt",
         "lte"
-    ],
-    "method": [
-        "CONNECT",
-        "DELETE",
-        "GET",
-        "HEAD",
-        "OPTIONS",
-        "PATCH",
-        "POST",
-        "PUT",
-        "TRACE"
     ],
     "cache_status": [
         "MISS",

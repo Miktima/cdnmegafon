@@ -19,7 +19,6 @@ class LogConstruct:
         self.plot_titiles = {
             'path': 'The requested path',
             'user_agent': 'The User-Agent HTTP header value',
-            'method': 'HTTP method used in the request',
             'client_ip': 'The IP from which the request was made',
             'status': 'HTTP status code',
             'size': 'Response size in bytes',

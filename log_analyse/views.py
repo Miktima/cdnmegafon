@@ -55,7 +55,6 @@ def index(request):
         'logfilter': settings.LOGFILTER,
         'logoperator': settings.LOGOPERATOR,
         'logoperatorplus': settings.LOGOPERATORPLUS,
-        'logmethod': settings.LOGMETHOD,
         'logcachestatus': settings.LOGCACHESTATUS
     }
     return render(request, "log_analyse/index.html", context)
@@ -107,7 +106,7 @@ def results(request):
         logConst = LogConstruct()
         # Получение параметров GET запроса для выборки
         req = logConst.consructRequest(portal_id, filter_list, from_date, to_date)
-        # Получние выборки
+        # Получение выборки
         reslog = requests.get(settings.APIURLS['urlLog'] + req, headers=headers)
         if reslog.status_code != 200:
             messages.error(request, "Ошибка выборки логов: " + str(reslog.status_code))
