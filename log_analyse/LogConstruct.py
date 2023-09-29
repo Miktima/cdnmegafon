@@ -48,11 +48,21 @@ class LogConstruct:
         data = []
         for agg in aggregate:
             tmpDict = {}
-            # request_uri chart
             ser = (log_table[agg].value_counts()).head(20)
             tmpDict["values"] = ser.to_dict()
             # x_values = ser.tolist()
             fig, ax = plt.subplots(figsize=(7, 7))
+            print ("length ser", len(ser))
+            lenSer = len(ser)
+            if lenSer < 20:
+                if lenSer > 0:                    
+                    lastInd = ser.keys()[-1]
+                    print (type(lastInd))
+                for i in range(lenSer, 20):
+                    if isinstance(lastInd, int):
+                        ser[i] = 0
+                    if isinstance(lastInd, str):
+                        ser[str(i)] = 0
             ax.bar(x, ser, width=1, edgecolor="white", linewidth=0.7, align='edge')
             ax.set(xlim=(1, 20), xticks=xticks)
             ax.xaxis.set_major_locator(MaxNLocator(integer=True))

@@ -106,6 +106,7 @@ def results(request):
         logConst = LogConstruct()
         # Получение параметров GET запроса для выборки
         req = logConst.consructRequest(portal_id, filter_list, from_date, to_date)
+        print (req)
         # Получение выборки
         reslog = requests.get(settings.APIURLS['urlLog'] + req, headers=headers)
         if reslog.status_code != 200:
