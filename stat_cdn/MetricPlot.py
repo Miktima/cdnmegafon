@@ -17,78 +17,77 @@ class MetricPlot:
 
     def StatPlot(self, metric, portal_id, response):
         # Проверяем, что метрика должна возвращать байты и определяем заголовок графика
-        match metric:
-            case 'upstream_bytes':
-                title = 'Traffic from the source to the CDN servers'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'sent_bytes':
-                title = 'Traffic from CDN servers to the end users'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'shield_bytes':
-                title = 'Traffic from shielding to CDN servers'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'total_bytes':
-                title = 'The sum of shield_bytes, upstream_bytes and sent_bytes traffic'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'cdn_bytes':
-                title = 'The sum of sent_bytes and shield_bytes traffic'
-                factor = self.gbyte
-                ylable = 'GB'
-            case 'requests':
-                title = 'The number of requests to the CDN servers'
-                factor = self.mil
-                ylable = 'Million'
-            case 'requests_waf_passed':
-                title = 'The number of requests that were processed by the Basic WAF option'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_2xx':
-                title = 'The number of 2xx HTTP response status codes'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_3xx':
-                title = 'The number of 3xx HTTP response status codes'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_4xx':
-                title = 'The number of 4xx HTTP response status codes'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_5xx':
-                title = 'The number of 5xx HTTP response status codes'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_hit':
-                title = 'The number of responses with the HTTP header Cache: HIT'
-                factor = self.mil
-                ylable = 'Million'
-            case 'responses_miss':
-                title = 'The number of responses with the HTTP header Cache: MISS'
-                factor = self.mil
-                ylable = 'Million'
-            case 'image_processed':
-                title = 'The number of images processed by the Image optimization option'
-                factor = self.mil
-                ylable = 'Million'
-            case 'cache_hit_traffic_ratio':
-                title = 'The amount of cached traffic'
-                factor = 1
-                ylable = 'Ratio'
-            case 'cache_hit_requests_ratio':
-                title = 'The amount of cached content that is sent'
-                factor = 1
-                ylable = 'Ratio'
-            case 'shield_traffic_ratio':
-                title = 'The efficiency of shielding'
-                factor = 1
-                ylable = 'Ratio'
-            case _:
-                print ("ERROR: unsupported metric for StatPlot")
-                return False
+        if metric == 'upstream_bytes':
+            title = 'Traffic from the source to the CDN servers'
+            factor = self.gbyte
+            ylable = 'GB'
+        elif metric == 'sent_bytes':
+            title = 'Traffic from CDN servers to the end users'
+            factor = self.gbyte
+            ylable = 'GB'
+        elif metric == 'shield_bytes':
+            title = 'Traffic from shielding to CDN servers'
+            factor = self.gbyte
+            ylable = 'GB'
+        elif metric == 'total_bytes':
+            title = 'The sum of shield_bytes, upstream_bytes and sent_bytes traffic'
+            factor = self.gbyte
+            ylable = 'GB'
+        elif metric == 'cdn_bytes':
+            title = 'The sum of sent_bytes and shield_bytes traffic'
+            factor = self.gbyte
+            ylable = 'GB'
+        elif metric == 'requests':
+            title = 'The number of requests to the CDN servers'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric == 'requests_waf_passed':
+            title = 'The number of requests that were processed by the Basic WAF option'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric == 'responses_2xx':
+            title = 'The number of 2xx HTTP response status codes'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric == 'responses_3xx':
+            title = 'The number of 3xx HTTP response status codes'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric == 'responses_4xx':
+            title = 'The number of 4xx HTTP response status codes'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric == 'responses_5xx':
+            title = 'The number of 5xx HTTP response status codes'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric == 'responses_hit':
+            title = 'The number of responses with the HTTP header Cache: HIT'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric =='responses_miss':
+            title = 'The number of responses with the HTTP header Cache: MISS'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric == 'image_processed':
+            title = 'The number of images processed by the Image optimization option'
+            factor = self.mil
+            ylable = 'Million'
+        elif metric == 'cache_hit_traffic_ratio':
+            title = 'The amount of cached traffic'
+            factor = 1
+            ylable = 'Ratio'
+        elif metric == 'cache_hit_requests_ratio':
+            title = 'The amount of cached content that is sent'
+            factor = 1
+            ylable = 'Ratio'
+        elif metric == 'shield_traffic_ratio':
+            title = 'The efficiency of shielding'
+            factor = 1
+            ylable = 'Ratio'
+        else:
+            print ("ERROR: unsupported metric for StatPlot")
+            return False
         # Добираемся до данных формата: 
         # 1680570000 — the time in the UNIX timestamp at which the statistics were received
         # 17329220573 — number of bytes
